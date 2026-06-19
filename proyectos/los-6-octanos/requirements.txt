@@ -2,3 +2,9 @@ streamlit
 pandas
 requests
 plotly
+googlemaps
+geopy
+streamlit-geolocation
+folium
+streamlit-folium
+branca
