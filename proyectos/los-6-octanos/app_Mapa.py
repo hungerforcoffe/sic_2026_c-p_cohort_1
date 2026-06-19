@@ -1,5 +1,5 @@
 """
-appV3.py — Dashboard de Precios de Combustibles en Chile
+app_Mapa.py — Dashboard de Precios de Combustibles en Chile
 Google Maps de fondo (Folium) + Ruta trazada + Pines SVG + Leyenda externa
 """
 
