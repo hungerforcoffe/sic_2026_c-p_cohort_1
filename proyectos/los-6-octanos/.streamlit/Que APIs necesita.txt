@@ -1,0 +1,40 @@
+Address Validation API
+Aerial View API
+Air Quality API
+Directions API
+Distance Matrix API
+Geocoding API
+Geolocation API
+Isochrones API
+Map Management API
+Map Tiles API
+Maps 3D SDK for Android
+Maps 3D SDK for iOS
+Maps Elevation API
+Maps Embed API
+Maps Grounding Lite API
+Maps JavaScript API
+Maps Platform Datasets API
+Maps SDK for Android
+Maps SDK for iOS
+Maps Static API
+Navigation Connect API
+Navigation SDK
+Places Aggregate API
+Places API
+Places API (New)
+Places UI Kit
+Pollen API
+Roads API
+Route Optimization API
+Routes API
+Solar API
+Street View Publish API
+Street View Static API
+Time Zone API
+Weather API
+
+Usadas realmente:
+Routes API	
+Geocoding API
+Distance Matrix API
