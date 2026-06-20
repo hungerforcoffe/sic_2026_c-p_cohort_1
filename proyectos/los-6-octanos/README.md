@@ -46,24 +46,26 @@ Puedes probar nuestro Dashboard interactivo aquí:
 
 Crea una carpeta llamada .streamlit en la raíz del proyecto y dentro un archivo secrets.toml con tus credenciales:
 
-```bash
-Ini, TOML
-CNE_EMAIL = "tu_correo@ejemplo.com"
-CNE_PASSWORD = "tu_clave"
-GOOGLE_API_KEY = "tu_api_key_de_gemini"```
+
+```Ini, TOML
+  CNE_EMAIL = "tu_correo@ejemplo.com"
+  CNE_PASSWORD = "tu_clave"
+  GOOGLE_API_KEY = "tu_api_key_de_gemini"
+```
 
 Ejecuta la aplicación:
 
-```bash
-streamlit run app.py```
+  ```streamlit run app.py```
+  
+---
 
 ## 👥Integrantes del Equipo
 
-Laura Díaz
-Nicolás Torres
-Noemi Calabuig
-Pablo Rojas
-Vicente Yunusic
-Nicol Sandoval
+* Laura Díaz
+* Nicolás Torres
+* Noemi Calabuig
+* Pablo Rojas
+* Vicente Yunusic
+* Nicol Sandoval
 
 Fuente de datos: Comisión Nacional de Energía (CNE), Chile.
