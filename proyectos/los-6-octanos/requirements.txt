@@ -3,3 +3,8 @@ pandas
 requests
 plotly
 google-genai
+folium
+streamlit-folium
+streamlit-geolocation
+geopy
+branca
