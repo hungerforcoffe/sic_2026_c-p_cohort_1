@@ -1,0 +1,347 @@
+cut_region,nombre_region_dl2339,cut_provincia,nombre_provincia_dl2339,cut_comuna,nombre_comuna_dl2339,fecha_act
+10,Región de Los Lagos,101,Llanquihue,10101,Puerto Montt,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10102,Calbuco,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10103,Cochamó,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10104,Fresia,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10105,Frutillar,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10106,Los Muermos,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10107,Llanquihue,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10108,Maullín,2025-12-01
+10,Región de Los Lagos,101,Llanquihue,10109,Puerto Varas,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10201,Castro,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10202,Ancud,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10203,Chonchi,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10204,Curaco de Vélez,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10205,Dalcahue,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10206,Puqueldón,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10207,Queilén,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10208,Quellón,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10209,Quemchi,2025-12-01
+10,Región de Los Lagos,102,Chiloé,10210,Quinchao,2025-12-01
+10,Región de Los Lagos,103,Osorno,10301,Osorno,2025-12-01
+10,Región de Los Lagos,103,Osorno,10302,Puerto Octay,2025-12-01
+10,Región de Los Lagos,103,Osorno,10303,Purranque,2025-12-01
+10,Región de Los Lagos,103,Osorno,10304,Puyehue,2025-12-01
+10,Región de Los Lagos,103,Osorno,10305,Río Negro,2025-12-01
+10,Región de Los Lagos,103,Osorno,10306,San Juan de la Costa,2025-12-01
+10,Región de Los Lagos,103,Osorno,10307,San Pablo,2025-12-01
+10,Región de Los Lagos,104,Palena,10401,Chaitén,2025-12-01
+10,Región de Los Lagos,104,Palena,10402,Futaleufú,2025-12-01
+10,Región de Los Lagos,104,Palena,10403,Hualaihué,2025-12-01
+10,Región de Los Lagos,104,Palena,10404,Palena,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,111,Coihaique,11101,Coihaique,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,111,Coihaique,11102,Lago Verde,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,112,Aisén,11201,Aisén,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,112,Aisén,11202,Cisnes,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,112,Aisén,11203,Guaitecas,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,113,Capitán Prat,11301,Cochrane,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,113,Capitán Prat,11302,O'Higgins,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,113,Capitán Prat,11303,Tortel,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,114,General Carrera,11401,Chile Chico,2025-12-01
+11,Región Aisén del Gral.Carlos Ibáñez del Campo,114,General Carrera,11402,Río Ibáñez,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,121,Magallanes,12101,Punta Arenas,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,121,Magallanes,12102,Laguna Blanca,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,121,Magallanes,12103,Río Verde,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,121,Magallanes,12104,San Gregorio,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,122,Antártica Chilena,12202,Antártica,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,122,Antártica Chilena,12201,Cabo de Hornos,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,123,Tierra del Fuego,12301,Porvenir,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,123,Tierra del Fuego,12302,Primavera,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,123,Tierra del Fuego,12303,Timaukel,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,124,Última Esperanza,12401,Natales,2025-12-01
+12,Región de Magallanes y de la Antártica Chilena,124,Última Esperanza,12402,Torres del Paine,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13101,Santiago,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13102,Cerrillos,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13103,Cerro Navia,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13104,Conchalí,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13105,El Bosque,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13106,Estación Central,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13107,Huechuraba,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13108,Independencia,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13109,La Cisterna,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13110,La Florida,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13111,La Granja,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13112,La Pintana,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13113,La Reina,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13114,Las Condes,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13115,Lo Barnechea,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13116,Lo Espejo,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13117,Lo Prado,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13118,Macul,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13119,Maipú,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13120,Ñuñoa,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13121,Pedro Aguirre Cerda,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13122,Peñalolén,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13123,Providencia,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13124,Pudahuel,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13125,Quilicura,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13126,Quinta Normal,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13127,Recoleta,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13128,Renca,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13129,San Joaquín,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13130,San Miguel,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13131,San Ramón,2025-12-01
+13,Región Metropolitana de Santiago,131,Santiago,13132,Vitacura,2025-12-01
+13,Región Metropolitana de Santiago,132,Cordillera,13201,Puente Alto,2025-12-01
+13,Región Metropolitana de Santiago,132,Cordillera,13202,Pirque,2025-12-01
+13,Región Metropolitana de Santiago,132,Cordillera,13203,San José de Maipo,2025-12-01
+13,Región Metropolitana de Santiago,133,Chacabuco,13301,Colina,2025-12-01
+13,Región Metropolitana de Santiago,133,Chacabuco,13302,Lampa,2025-12-01
+13,Región Metropolitana de Santiago,133,Chacabuco,13303,Tiltil,2025-12-01
+13,Región Metropolitana de Santiago,134,Maipo,13401,San Bernardo,2025-12-01
+13,Región Metropolitana de Santiago,134,Maipo,13402,Buin,2025-12-01
+13,Región Metropolitana de Santiago,134,Maipo,13403,Calera de Tango,2025-12-01
+13,Región Metropolitana de Santiago,134,Maipo,13404,Paine,2025-12-01
+13,Región Metropolitana de Santiago,135,Melipilla,13501,Melipilla,2025-12-01
+13,Región Metropolitana de Santiago,135,Melipilla,13502,Alhué,2025-12-01
+13,Región Metropolitana de Santiago,135,Melipilla,13503,Curacaví,2025-12-01
+13,Región Metropolitana de Santiago,135,Melipilla,13504,María Pinto,2025-12-01
+13,Región Metropolitana de Santiago,135,Melipilla,13505,San Pedro,2025-12-01
+13,Región Metropolitana de Santiago,136,Talagante,13601,Talagante,2025-12-01
+13,Región Metropolitana de Santiago,136,Talagante,13602,El Monte,2025-12-01
+13,Región Metropolitana de Santiago,136,Talagante,13603,Isla de Maipo,2025-12-01
+13,Región Metropolitana de Santiago,136,Talagante,13604,Padre Hurtado,2025-12-01
+13,Región Metropolitana de Santiago,136,Talagante,13605,Peñaflor,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14101,Valdivia,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14102,Corral,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14103,Lanco,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14104,Los Lagos,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14105,Máfil,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14106,Mariquina,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14107,Paillaco,2025-12-01
+14,Región de Los Ríos,141,Valdivia,14108,Panguipulli,2025-12-01
+14,Región de Los Ríos,142,Ranco,14201,La Unión,2025-12-01
+14,Región de Los Ríos,142,Ranco,14202,Futrono,2025-12-01
+14,Región de Los Ríos,142,Ranco,14203,Lago Ranco,2025-12-01
+14,Región de Los Ríos,142,Ranco,14204,Río Bueno,2025-12-01
+15,Región de Arica y Parinacota,151,Arica,15101,Arica,2025-12-01
+15,Región de Arica y Parinacota,151,Arica,15102,Camarones,2025-12-01
+15,Región de Arica y Parinacota,152,Parinacota,15201,Putre,2025-12-01
+15,Región de Arica y Parinacota,152,Parinacota,15202,General Lagos,2025-12-01
+16,Región de Ñuble,161,Diguillín,16101,Chillán,2025-12-01
+16,Región de Ñuble,161,Diguillín,16102,Bulnes,2025-12-01
+16,Región de Ñuble,161,Diguillín,16103,Chillán Viejo,2025-12-01
+16,Región de Ñuble,161,Diguillín,16104,El Carmen,2025-12-01
+16,Región de Ñuble,161,Diguillín,16105,Pemuco,2025-12-01
+16,Región de Ñuble,161,Diguillín,16106,Pinto,2025-12-01
+16,Región de Ñuble,161,Diguillín,16107,Quillón,2025-12-01
+16,Región de Ñuble,161,Diguillín,16108,San Ignacio,2025-12-01
+16,Región de Ñuble,161,Diguillín,16109,Yungay,2025-12-01
+16,Región de Ñuble,162,Itata,16201,Quirihue,2025-12-01
+16,Región de Ñuble,162,Itata,16202,Cobquecura,2025-12-01
+16,Región de Ñuble,162,Itata,16203,Coelemu,2025-12-01
+16,Región de Ñuble,162,Itata,16204,Ninhue,2025-12-01
+16,Región de Ñuble,162,Itata,16205,Portezuelo,2025-12-01
+16,Región de Ñuble,162,Itata,16206,Ranquil,2025-12-01
+16,Región de Ñuble,162,Itata,16207,Treguaco,2025-12-01
+16,Región de Ñuble,163,Punilla,16301,San Carlos,2025-12-01
+16,Región de Ñuble,163,Punilla,16302,Coihueco,2025-12-01
+16,Región de Ñuble,163,Punilla,16303,Ñiquén,2025-12-01
+16,Región de Ñuble,163,Punilla,16304,San Fabián,2025-12-01
+16,Región de Ñuble,163,Punilla,16305,San Nicolás,2025-12-01
+1,Región de Tarapacá,11,Iquique,1101,Iquique,2025-12-01
+1,Región de Tarapacá,11,Iquique,1107,Alto Hospicio,2025-12-01
+1,Región de Tarapacá,14,Tamarugal,1401,Pozo Almonte,2025-12-01
+1,Región de Tarapacá,14,Tamarugal,1402,Camiña,2025-12-01
+1,Región de Tarapacá,14,Tamarugal,1403,Colchane,2025-12-01
+1,Región de Tarapacá,14,Tamarugal,1404,Huara,2025-12-01
+1,Región de Tarapacá,14,Tamarugal,1405,Pica,2025-12-01
+2,Región de Antofagasta,21,Antofagasta,2101,Antofagasta,2025-12-01
+2,Región de Antofagasta,21,Antofagasta,2102,Mejillones,2025-12-01
+2,Región de Antofagasta,21,Antofagasta,2103,Sierra Gorda,2025-12-01
+2,Región de Antofagasta,21,Antofagasta,2104,Taltal,2025-12-01
+2,Región de Antofagasta,22,El Loa,2201,Calama,2025-12-01
+2,Región de Antofagasta,22,El Loa,2202,Ollagüe,2025-12-01
+2,Región de Antofagasta,22,El Loa,2203,San Pedro de Atacama,2025-12-01
+2,Región de Antofagasta,23,Tocopilla,2301,Tocopilla,2025-12-01
+2,Región de Antofagasta,23,Tocopilla,2302,María Elena,2025-12-01
+3,Región de Atacama,31,Copiapó,3101,Copiapó,2025-12-01
+3,Región de Atacama,31,Copiapó,3102,Caldera,2025-12-01
+3,Región de Atacama,31,Copiapó,3103,Tierra Amarilla,2025-12-01
+3,Región de Atacama,32,Chañaral,3201,Chañaral,2025-12-01
+3,Región de Atacama,32,Chañaral,3202,Diego de Almagro,2025-12-01
+3,Región de Atacama,33,Huasco,3301,Vallenar,2025-12-01
+3,Región de Atacama,33,Huasco,3302,Alto del Carmen,2025-12-01
+3,Región de Atacama,33,Huasco,3303,Freirina,2025-12-01
+3,Región de Atacama,33,Huasco,3304,Huasco,2025-12-01
+4,Región de Coquimbo,41,Elqui,4101,La Serena,2025-12-01
+4,Región de Coquimbo,41,Elqui,4102,Coquimbo,2025-12-01
+4,Región de Coquimbo,41,Elqui,4103,Andacollo,2025-12-01
+4,Región de Coquimbo,41,Elqui,4104,La Higuera,2025-12-01
+4,Región de Coquimbo,41,Elqui,4105,Paiguano,2025-12-01
+4,Región de Coquimbo,41,Elqui,4106,Vicuña,2025-12-01
+4,Región de Coquimbo,42,Choapa,4201,Illapel,2025-12-01
+4,Región de Coquimbo,42,Choapa,4202,Canela,2025-12-01
+4,Región de Coquimbo,42,Choapa,4203,Los Vilos,2025-12-01
+4,Región de Coquimbo,42,Choapa,4204,Salamanca,2025-12-01
+4,Región de Coquimbo,43,Limarí,4301,Ovalle,2025-12-01
+4,Región de Coquimbo,43,Limarí,4302,Combarbalá,2025-12-01
+4,Región de Coquimbo,43,Limarí,4303,Monte Patria,2025-12-01
+4,Región de Coquimbo,43,Limarí,4304,Punitaqui,2025-12-01
+4,Región de Coquimbo,43,Limarí,4305,Río Hurtado,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5101,Valparaíso,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5102,Casablanca,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5103,Concón,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5104,Juan Fernández,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5105,Puchuncaví,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5107,Quintero,2025-12-01
+5,Región de Valparaíso,51,Valparaíso,5109,Viña del Mar,2025-12-01
+5,Región de Valparaíso,52,Isla de Pascua,5201,Isla de Pascua,2025-12-01
+5,Región de Valparaíso,53,Los Andes,5301,Los Andes,2025-12-01
+5,Región de Valparaíso,53,Los Andes,5302,Calle Larga,2025-12-01
+5,Región de Valparaíso,53,Los Andes,5303,Rinconada,2025-12-01
+5,Región de Valparaíso,53,Los Andes,5304,San Esteban,2025-12-01
+5,Región de Valparaíso,54,Petorca,5401,La Ligua,2025-12-01
+5,Región de Valparaíso,54,Petorca,5402,Cabildo,2025-12-01
+5,Región de Valparaíso,54,Petorca,5403,Papudo,2025-12-01
+5,Región de Valparaíso,54,Petorca,5404,Petorca,2025-12-01
+5,Región de Valparaíso,54,Petorca,5405,Zapallar,2025-12-01
+5,Región de Valparaíso,55,Quillota,5501,Quillota,2025-12-01
+5,Región de Valparaíso,55,Quillota,5502,Calera,2025-12-01
+5,Región de Valparaíso,55,Quillota,5503,Hijuelas,2025-12-01
+5,Región de Valparaíso,55,Quillota,5504,La Cruz,2025-12-01
+5,Región de Valparaíso,55,Quillota,5506,Nogales,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5601,San Antonio,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5602,Algarrobo,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5603,Cartagena,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5604,El Quisco,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5605,El Tabo,2025-12-01
+5,Región de Valparaíso,56,San Antonio,5606,Santo Domingo,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5701,San Felipe,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5702,Catemu,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5703,Llaillay,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5704,Panquehue,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5705,Putaendo,2025-12-01
+5,Región de Valparaíso,57,San Felipe de Aconcagua,5706,Santa María,2025-12-01
+5,Región de Valparaíso,58,Marga Marga,5801,Quilpué,2025-12-01
+5,Región de Valparaíso,58,Marga Marga,5802,Limache,2025-12-01
+5,Región de Valparaíso,58,Marga Marga,5803,Olmué,2025-12-01
+5,Región de Valparaíso,58,Marga Marga,5804,Villa Alemana,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6101,Rancagua,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6102,Codegua,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6103,Coinco,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6104,Coltauco,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6105,Doñihue,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6106,Graneros,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6107,Las Cabras,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6108,Machalí,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6109,Malloa,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6110,Mostazal,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6111,Olivar,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6112,Peumo,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6113,Pichidegua,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6114,Quinta de Tilcoco,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6115,Rengo,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6116,Requínoa,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,61,Cachapoal,6117,San Vicente,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6201,Pichilemu,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6202,La Estrella,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6203,Litueche,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6204,Marchihue,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6205,Navidad,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,62,Cardenal Caro,6206,Paredones,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6301,San Fernando,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6302,Chépica,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6303,Chimbarongo,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6304,Lolol,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6305,Nancagua,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6306,Palmilla,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6307,Peralillo,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6308,Placilla,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6309,Pumanque,2025-12-01
+6,Región del Libertador Gral. Bernardo O’Higgins,63,Colchagua,6310,Santa Cruz,2025-12-01
+7,Región del Maule,71,Talca,7101,Talca,2025-12-01
+7,Región del Maule,71,Talca,7102,Constitución,2025-12-01
+7,Región del Maule,71,Talca,7103,Curepto,2025-12-01
+7,Región del Maule,71,Talca,7104,Empedrado,2025-12-01
+7,Región del Maule,71,Talca,7105,Maule,2025-12-01
+7,Región del Maule,71,Talca,7106,Pelarco,2025-12-01
+7,Región del Maule,71,Talca,7107,Pencahue,2025-12-01
+7,Región del Maule,71,Talca,7108,Río Claro,2025-12-01
+7,Región del Maule,71,Talca,7109,San Clemente,2025-12-01
+7,Región del Maule,71,Talca,7110,San Rafael,2025-12-01
+7,Región del Maule,72,Cauquenes,7201,Cauquenes,2025-12-01
+7,Región del Maule,72,Cauquenes,7202,Chanco,2025-12-01
+7,Región del Maule,72,Cauquenes,7203,Pelluhue,2025-12-01
+7,Región del Maule,73,Curicó,7301,Curicó,2025-12-01
+7,Región del Maule,73,Curicó,7302,Hualañé,2025-12-01
+7,Región del Maule,73,Curicó,7303,Licantén,2025-12-01
+7,Región del Maule,73,Curicó,7304,Molina,2025-12-01
+7,Región del Maule,73,Curicó,7305,Rauco,2025-12-01
+7,Región del Maule,73,Curicó,7306,Romeral,2025-12-01
+7,Región del Maule,73,Curicó,7307,Sagrada Familia,2025-12-01
+7,Región del Maule,73,Curicó,7308,Teno,2025-12-01
+7,Región del Maule,73,Curicó,7309,Vichuquén,2025-12-01
+7,Región del Maule,74,Linares,7401,Linares,2025-12-01
+7,Región del Maule,74,Linares,7402,Colbún,2025-12-01
+7,Región del Maule,74,Linares,7403,Longaví,2025-12-01
+7,Región del Maule,74,Linares,7404,Parral,2025-12-01
+7,Región del Maule,74,Linares,7405,Retiro,2025-12-01
+7,Región del Maule,74,Linares,7406,San Javier,2025-12-01
+7,Región del Maule,74,Linares,7407,Villa Alegre,2025-12-01
+7,Región del Maule,74,Linares,7408,Yerbas Buenas,2025-12-01
+8,Región del Biobío,81,Concepción,8101,Concepción,2025-12-01
+8,Región del Biobío,81,Concepción,8102,Coronel,2025-12-01
+8,Región del Biobío,81,Concepción,8103,Chiguayante,2025-12-01
+8,Región del Biobío,81,Concepción,8104,Florida,2025-12-01
+8,Región del Biobío,81,Concepción,8105,Hualqui,2025-12-01
+8,Región del Biobío,81,Concepción,8106,Lota,2025-12-01
+8,Región del Biobío,81,Concepción,8107,Penco,2025-12-01
+8,Región del Biobío,81,Concepción,8108,San Pedro de la Paz,2025-12-01
+8,Región del Biobío,81,Concepción,8109,Santa Juana,2025-12-01
+8,Región del Biobío,81,Concepción,8110,Talcahuano,2025-12-01
+8,Región del Biobío,81,Concepción,8111,Tomé,2025-12-01
+8,Región del Biobío,81,Concepción,8112,Hualpén,2025-12-01
+8,Región del Biobío,82,Arauco,8201,Lebu,2025-12-01
+8,Región del Biobío,82,Arauco,8202,Arauco,2025-12-01
+8,Región del Biobío,82,Arauco,8203,Cañete,2025-12-01
+8,Región del Biobío,82,Arauco,8204,Contulmo,2025-12-01
+8,Región del Biobío,82,Arauco,8205,Curanilahue,2025-12-01
+8,Región del Biobío,82,Arauco,8206,Los Álamos,2025-12-01
+8,Región del Biobío,82,Arauco,8207,Tirúa,2025-12-01
+8,Región del Biobío,83,Biobío,8301,Los Ángeles,2025-12-01
+8,Región del Biobío,83,Biobío,8302,Antuco,2025-12-01
+8,Región del Biobío,83,Biobío,8303,Cabrero,2025-12-01
+8,Región del Biobío,83,Biobío,8304,Laja,2025-12-01
+8,Región del Biobío,83,Biobío,8305,Mulchén,2025-12-01
+8,Región del Biobío,83,Biobío,8306,Nacimiento,2025-12-01
+8,Región del Biobío,83,Biobío,8307,Negrete,2025-12-01
+8,Región del Biobío,83,Biobío,8308,Quilaco,2025-12-01
+8,Región del Biobío,83,Biobío,8309,Quilleco,2025-12-01
+8,Región del Biobío,83,Biobío,8310,San Rosendo,2025-12-01
+8,Región del Biobío,83,Biobío,8311,Santa Bárbara,2025-12-01
+8,Región del Biobío,83,Biobío,8312,Tucapel,2025-12-01
+8,Región del Biobío,83,Biobío,8313,Yumbel,2025-12-01
+8,Región del Biobío,83,Biobío,8314,Alto Biobío,2025-12-01
+9,Región de La Araucanía,91,Cautín,9101,Temuco,2025-12-01
+9,Región de La Araucanía,91,Cautín,9102,Carahue,2025-12-01
+9,Región de La Araucanía,91,Cautín,9103,Cunco,2025-12-01
+9,Región de La Araucanía,91,Cautín,9104,Curarrehue,2025-12-01
+9,Región de La Araucanía,91,Cautín,9105,Freire,2025-12-01
+9,Región de La Araucanía,91,Cautín,9106,Galvarino,2025-12-01
+9,Región de La Araucanía,91,Cautín,9107,Gorbea,2025-12-01
+9,Región de La Araucanía,91,Cautín,9108,Lautaro,2025-12-01
+9,Región de La Araucanía,91,Cautín,9109,Loncoche,2025-12-01
+9,Región de La Araucanía,91,Cautín,9110,Melipeuco,2025-12-01
+9,Región de La Araucanía,91,Cautín,9111,Nueva Imperial,2025-12-01
+9,Región de La Araucanía,91,Cautín,9112,Padre Las Casas,2025-12-01
+9,Región de La Araucanía,91,Cautín,9113,Perquenco,2025-12-01
+9,Región de La Araucanía,91,Cautín,9114,Pitrufquén,2025-12-01
+9,Región de La Araucanía,91,Cautín,9115,Pucón,2025-12-01
+9,Región de La Araucanía,91,Cautín,9116,Saavedra,2025-12-01
+9,Región de La Araucanía,91,Cautín,9117,Teodoro Schmidt,2025-12-01
+9,Región de La Araucanía,91,Cautín,9118,Toltén,2025-12-01
+9,Región de La Araucanía,91,Cautín,9119,Vilcún,2025-12-01
+9,Región de La Araucanía,91,Cautín,9120,Villarrica,2025-12-01
+9,Región de La Araucanía,91,Cautín,9121,Cholchol,2025-12-01
+9,Región de La Araucanía,92,Malleco,9201,Angol,2025-12-01
+9,Región de La Araucanía,92,Malleco,9202,Collipulli,2025-12-01
+9,Región de La Araucanía,92,Malleco,9203,Curacautín,2025-12-01
+9,Región de La Araucanía,92,Malleco,9204,Ercilla,2025-12-01
+9,Región de La Araucanía,92,Malleco,9205,Lonquimay,2025-12-01
+9,Región de La Araucanía,92,Malleco,9206,Los Sauces,2025-12-01
+9,Región de La Araucanía,92,Malleco,9207,Lumaco,2025-12-01
+9,Región de La Araucanía,92,Malleco,9208,Purén,2025-12-01
+9,Región de La Araucanía,92,Malleco,9209,Renaico,2025-12-01
+9,Región de La Araucanía,92,Malleco,9210,Traiguén,2025-12-01
+9,Región de La Araucanía,92,Malleco,9211,Victoria,2025-12-01
