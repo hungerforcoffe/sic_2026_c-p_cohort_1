@@ -1,17 +1,9 @@
 """
-<<<<<<< HEAD
-app_multipage.py — Punto de entrada de la app multipágina (Mapa + Dashboard).
-
-Ejecutar:
-    pip install -r requirements.txt
-    streamlit run app_multipage.py
-=======
 app.py — Punto de entrada de la app multipágina (Mapa + Dashboard).
 
 Ejecutar:
     pip install -r requirements.txt
     streamlit run app.py
->>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
 """
 import streamlit as st
 
@@ -24,8 +16,6 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-<<<<<<< HEAD
-=======
 /* === 1. FUENTES === */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap');
         
@@ -151,7 +141,6 @@ st.markdown(
             line-height: 1.6 !important;
         }
 
->>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
         header[data-testid="stHeader"] {
             background-color: transparent !important;
         }
@@ -164,8 +153,6 @@ st.markdown(
         header[data-testid="stHeader"]:hover a:not([data-testid="stStatusWidget"] *) {
             opacity: 1;
         }
-<<<<<<< HEAD
-=======
         
      /* === INDICADOR DE CARGA: "REACTOR NEÓN" + OVERLAY DESENFOCADO === */
         
@@ -241,7 +228,6 @@ st.markdown(
             50% { opacity: 1; text-shadow: 0 0 15px rgba(16, 185, 129, 0.9); }
         }
 
->>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
         .block-container {
             padding-top: 2rem !important;
         }
@@ -253,19 +239,12 @@ st.markdown(
             top: 1rem;
             align-self: flex-start;
         }
-<<<<<<< HEAD
-=======
 }
->>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-<<<<<<< HEAD
-pagina_mapa = st.Page("paginas/mapa.py", title="Mapa", icon="🗺️", default=True)
-pagina_dashboard = st.Page("paginas/dashboard.py", title="Dashboard", icon="📊")
-=======
 # ==========================================
 # 🏛️ RENDERIZADO DEL HEADER DISTINTIVO
 # ==========================================
@@ -284,7 +263,6 @@ st.markdown(
 
 pagina_mapa = st.Page("paginas/mapa.py", title="Mapa", icon="🗺️", default=True)
 pagina_dashboard = st.Page("paginas/dashboard.py", title="Panel Estadístico", icon="📊")
->>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
 
 navegacion = st.navigation([pagina_mapa, pagina_dashboard])
 navegacion.run()
