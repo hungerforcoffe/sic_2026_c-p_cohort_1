@@ -5,8 +5,20 @@ Dashboard interactivo que muestra los precios de combustibles en las ~2.000 esta
 Proyecto desarrollado para el curso **Código y Programación** del **Samsung Innovation Campus (SIC) Chile 2026 - Cohorte 1**.
 
 ---
+## Equipo
+* Laura Díaz (GitHub: @lau-diaz-c)
+* Nicolás Torres (GitHub: @NicolasTorresSSNA)
+* Noemi Calabuig (GitHub: @noemicalabuig)
+* Pablo Rojas (GitHub: @hungerforcoffe)
+* Vicente Yunusic (GitHub: @vyunus)
+* Nicol Sandoval (GitHub: @nicolsandovalu)
+---
+## ⚙️ Datos
+* **Fuente de Datos:** [API Oficial de Combustibles de la CNE](https://api.cne.cl/api/v4/estaciones). *(Catálogo completo: https://apidocs.cne.cl)*
+Filas: N  |  Columnas: N  |  Licencia: CC0 / CC BY / etc. (rellenar)
 
-## 🎯 La Pregunta de Análisis
+---
+## 🎯 Pregunta de análisis
 **¿Dónde está el combustible más barato y cómo podemos ayudar al conductor a tomar decisiones informadas?**
 Este tablero permite a cualquier usuario, sin conocimientos técnicos, explorar precios por tipo de combustible, región, comuna y distribuidor para cuidar su bolsillo frente a las fluctuaciones del mercado.
 
@@ -26,8 +38,7 @@ Puedes probar nuestro Dashboard interactivo aquí:
 
 ---
 
-## ⚙️ Datos y Tecnología
-* **Fuente de Datos:** [API Oficial de Combustibles de la CNE](https://api.cne.cl/api/v4/estaciones). *(Catálogo completo: https://apidocs.cne.cl)*
+## ⚙️ Tecnología
 * **Módulos y Librerías del Curso:**
   * `pandas`: Descarga, aplanado de JSON anidado (`json_normalize`), limpieza de datos nulos, conversión de tipos numéricos y agregaciones.
   * `plotly`: Renderizado de mapas y gráficos responsivos.
@@ -37,35 +48,11 @@ Puedes probar nuestro Dashboard interactivo aquí:
 
 ---
 
-## 💻 Instrucciones para Ejecución Local
-
-1. Clona este repositorio.
-2. Instala las dependencias requeridas:
-   ```bash
-   pip install -r requirements.txt```
-
-Crea una carpeta llamada .streamlit en la raíz del proyecto y dentro un archivo secrets.toml con tus credenciales:
-
-
-```Ini, TOML
-  CNE_EMAIL = "tu_correo@ejemplo.com"
-  CNE_PASSWORD = "tu_clave"
-  GOOGLE_API_KEY = "tu_api_key_de_gemini"
-```
-
-Ejecuta la aplicación:
-
-  ```streamlit run app.py```
-  
----
-
-## 👥Integrantes del Equipo
-
-* Laura Díaz
-* Nicolás Torres
-* Noemi Calabuig
-* Pablo Rojas
-* Vicente Yunusic
-* Nicol Sandoval
-
+## Checklist
+- [ ] README con descripcion, dataset, pregunta, hallazgos y link al dashboard
+- [ ] requirements.txt actualizado
+- [ ] Dashboard publicado y accesible
+- [ ] Notebooks con comentarios en espanol
+- [ ] Sin archivos mayores a 50 MB
+      
 Fuente de datos: Comisión Nacional de Energía (CNE), Chile.

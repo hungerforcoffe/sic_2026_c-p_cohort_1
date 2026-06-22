@@ -35,12 +35,11 @@ FONDOS_MAPA = {
     "OpenStreetMap":  (None, "OpenStreetMap"),
 }
 
-# Paleta RdYlGn_r — verde=barato → rojo=caro
+# Paleta Eco-Drive adaptada para el mapa de calor (verde menta a rojo)
 GRADIENT_COLORS = [
-    "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b",
-    "#fee08b", "#fdae61", "#f46d43", "#d73027",
+    "#10B981", "#34D399", "#A7F3D0", "#FDE68A",
+    "#FBBF24", "#F59E0B", "#EF4444", "#B91C1C",
 ]
-
 
 # ═══════════════════════════════════════════════════════════════════
 # Utilidades generales
@@ -52,13 +51,11 @@ def obtener_gmaps_key():
     except Exception:
         return os.environ.get("GoogleMapsAPI")
 
-
 def obtener_google_api_key():
     try:
         return st.secrets["GOOGLE_API_KEY"]
     except Exception:
         return os.environ.get("GOOGLE_API_KEY")
-
 
 def pesos(x):
     try:
@@ -66,20 +63,15 @@ def pesos(x):
     except (ValueError, TypeError):
         return "N/A"
 
-
 def estilizar_barra_precio(fig, valores, padding_frac=0.12, min_padding=15):
-    """Acerca el eje de precio al rango real de los datos (en vez de partir en $0)
-    y agrega la etiqueta de precio exacto al final de cada barra, para que las
-    diferencias entre estaciones/comunas se noten aunque varíen poco entre sí."""
     vmin, vmax = float(min(valores)), float(max(valores))
     pad = max((vmax - vmin) * padding_frac, min_padding)
-    fig.update_traces(texttemplate="$%{x:,.0f}", textposition="outside", cliponaxis=False)
-    fig.update_xaxes(range=[max(0, vmin - pad), vmax + pad], tickprefix="$", tickformat=",.0f")
+    fig.update_traces(texttemplate="$%{x:,.0f}", textposition="outside", cliponaxis=False, textfont=dict(color="#F9FAFB"))
+    fig.update_xaxes(range=[max(0, vmin - pad), vmax + pad], tickprefix="$", tickformat=",.0f", gridcolor="#374151")
+    fig.update_yaxes(gridcolor="#374151")
     return fig
 
-
 def decode_polyline(encoded):
-    """Decodifica la polilínea codificada de Google Maps → lista de (lat, lon)."""
     coords = []
     index, lat, lng = 0, 0, 0
     n = len(encoded)
@@ -121,7 +113,7 @@ def cargar_datos():
         csv_path = os.path.join(os.path.dirname(__file__), "data", "dataset_limpio.csv")
 
     df_raw = pd.read_csv(csv_path, encoding="utf-8-sig")
-    df_raw.columns = df_raw.columns.str.replace("^﻿+", "", regex=True)
+    df_raw.columns = df_raw.columns.str.replace("^+", "", regex=True)
 
     mapa_combustibles = {
         "Gasolina 93": "Gasolina 93",
@@ -164,14 +156,12 @@ def cargar_datos():
     )
     return df_price
 
-
 # ═══════════════════════════════════════════════════════════════════
-# API: Geocodificación
+# APIs de Google (Geocode, Matrix, Routes) ... (SIN CAMBIOS LÓGICOS)
 # ═══════════════════════════════════════════════════════════════════
 
 @st.cache_data(ttl=3600, show_spinner="Geocodificando dirección...")
 def geocode_address_v3(address, api_key):
-    """Retorna (lat, lon, error_msg, error_code). Función pura — sin st.*."""
     url = "https://maps.googleapis.com/maps/api/geocode/json"
     try:
         r = requests.get(url, params={"address": address + ", Chile", "key": api_key}, timeout=10)
@@ -185,59 +175,31 @@ def geocode_address_v3(address, api_key):
     except Exception as exc:
         return None, None, f"Error al conectar con Geocoding API: {exc}", "CONNECTION_ERROR"
 
-
-# ═══════════════════════════════════════════════════════════════════
-# API: Matriz de rutas (para seleccionar mejor opción)
-# ═══════════════════════════════════════════════════════════════════
-
 @st.cache_data(ttl=3600, show_spinner="Calculando tiempos de viaje...")
 def get_route_matrix_v3(origin_lat, origin_lon, destinations, api_key):
-    """Retorna respuesta JSON de computeRouteMatrix o None."""
     url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix"
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": api_key,
         "X-Goog-FieldMask": "originIndex,destinationIndex,duration,distanceMeters,status",
     }
-    origins = [
-        {"waypoint": {"location": {"latLng": {"latitude": origin_lat, "longitude": origin_lon}}}}
-    ]
-    dests = [
-        {"waypoint": {"location": {"latLng": {"latitude": la, "longitude": lo}}}}
-        for la, lo in destinations[:25]
-    ]
+    origins = [{"waypoint": {"location": {"latLng": {"latitude": origin_lat, "longitude": origin_lon}}}}]
+    dests = [{"waypoint": {"location": {"latLng": {"latitude": la, "longitude": lo}}}} for la, lo in destinations[:25]]
     try:
-        r = requests.post(
-            url,
-            json={"origins": origins, "destinations": dests, "travelMode": "DRIVE"},
-            headers=headers, timeout=15,
-        )
+        r = requests.post(url, json={"origins": origins, "destinations": dests, "travelMode": "DRIVE"}, headers=headers, timeout=15)
         r.raise_for_status()
         return r.json()
     except Exception as exc:
         logging.warning("Route matrix failed: %s", exc)
         return None
 
-
-# ═══════════════════════════════════════════════════════════════════
-# API: Ruta con polilínea + ETA con tráfico
-# ═══════════════════════════════════════════════════════════════════
-
 @st.cache_data(ttl=300, show_spinner="Trazando ruta con tráfico...")
 def get_route_polyline_v3(origin_lat, origin_lon, dest_lat, dest_lon, api_key):
-    """
-    Llama a computeRoutes y retorna (coords, dur_min, dist_km, error_msg, traffic_label).
-    Usa TRAFFIC_AWARE para ETA real; cae a DRIVE_UNSPECIFIED si falla.
-    """
     url = "https://routes.googleapis.com/directions/v2:computeRoutes"
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": (
-            "routes.polyline.encodedPolyline,"
-            "routes.duration,"
-            "routes.distanceMeters"
-        ),
+        "X-Goog-FieldMask": "routes.polyline.encodedPolyline,routes.duration,routes.distanceMeters",
     }
     origin_wp = {"location": {"latLng": {"latitude": origin_lat, "longitude": origin_lon}}}
     dest_wp   = {"location": {"latLng": {"latitude": dest_lat,   "longitude": dest_lon}}}
@@ -278,26 +240,24 @@ def get_route_polyline_v3(origin_lat, origin_lon, dest_lat, dest_lon, api_key):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# HTML: Popup de marcador y leyenda lateral
+# HTML: Popup de marcador y leyenda lateral (REDISEÑADOS)
 # ═══════════════════════════════════════════════════════════════════
 
-def make_popup_html(row, combustible, tag=None,
-                    user_lat=None, user_lon=None,
-                    tiempo_min=None, distancia_km=None, traffic_label=""):
+def make_popup_html(row, combustible, tag=None, user_lat=None, user_lon=None, tiempo_min=None, distancia_km=None, traffic_label=""):
     precio_str = pesos(row.get(combustible, 0))
 
     tag_html = ""
     if tag == "best":
         tag_html = (
-            '<div style="background:#15803d;color:#fff;padding:4px 10px;border-radius:5px;'
-            'font-weight:700;font-size:12px;margin-bottom:8px;text-align:center;">'
-            '🌟 Mejor Opción</div>'
+            '<div style="background:rgba(16, 185, 129, 0.15);color:#10B981;border: 1px solid rgba(16, 185, 129, 0.3);'
+            'padding:4px 10px;border-radius:6px;font-weight:700;font-size:11px;margin-bottom:8px;text-align:center;text-transform:uppercase;">'
+            'Mejor Opción Calculada</div>'
         )
     elif tag == "second":
         tag_html = (
-            '<div style="background:#dc2626;color:#fff;padding:4px 10px;border-radius:5px;'
-            'font-weight:700;font-size:12px;margin-bottom:8px;text-align:center;">'
-            '⭐ Segunda Opción</div>'
+            '<div style="background:rgba(59, 130, 246, 0.15);color:#3B82F6;border: 1px solid rgba(59, 130, 246, 0.3);'
+            'padding:4px 10px;border-radius:6px;font-weight:700;font-size:11px;margin-bottom:8px;text-align:center;text-transform:uppercase;">'
+            'Alternativa Cercana</div>'
         )
 
     route_html = ""
@@ -310,40 +270,36 @@ def make_popup_html(row, combustible, tag=None,
         trip_info = ""
         if tiempo_min is not None and tiempo_min != float("inf"):
             d_str = f"{distancia_km:.1f} km · " if distancia_km else ""
-            trip_info = (
-                f'<div style="font-size:11px;color:#555;margin-top:5px;text-align:center;">'
-                f"{d_str}~{int(tiempo_min)} min ({traffic_label})</div>"
-            )
+            trip_info = f'<div style="font-size:11px;color:#6B7280;margin-top:5px;text-align:center;">{d_str}~{int(tiempo_min)} min ({traffic_label})</div>'
+        
+        # Botón estilo Eco-Drive Verde Menta
         route_html = f"""
         {trip_info}
-        <div style="margin-top:7px;text-align:center;">
+        <div style="margin-top:10px;text-align:center;">
             <a href="{gm_url}" target="_blank"
-               style="display:inline-block;background:#4285f4;color:#fff;
-                      padding:6px 14px;border-radius:6px;text-decoration:none;
-                      font-size:12px;font-weight:600;">
-                📍 Abrir ruta en Google Maps
+               style="display:inline-block;background:#10B981;color:#ffffff;
+                      padding:8px 16px;border-radius:8px;text-decoration:none;
+                      font-size:13px;font-weight:600;box-shadow: 0 2px 4px rgba(16,185,129,0.3);">
+                Abrir ruta en Google Maps
             </a>
         </div>"""
 
     return f"""
-    <div style="font-family:'Segoe UI',Arial,sans-serif;min-width:240px;padding:3px;">
+    <div style="font-family:'Inter',sans-serif;min-width:240px;padding:5px;">
         {tag_html}
-        <h4 style="margin:0 0 8px 0;color:#111;font-size:15px;">{row.get("marca","N/A")}</h4>
-        <table style="font-size:13px;line-height:1.75;width:100%;border-collapse:collapse;">
+        <h4 style="margin:0 0 10px 0;color:#111827;font-size:16px;font-family:'Space Grotesk',sans-serif;">{row.get("marca","N/A")}</h4>
+        <table style="font-size:13px;line-height:1.8;width:100%;border-collapse:collapse;">
             <tr>
-                <td style="font-weight:600;color:#555;padding-right:10px;white-space:nowrap;">
-                    Comuna:</td>
-                <td style="color:#111;">{row.get("comuna","N/A")}</td>
+                <td style="font-weight:600;color:#6B7280;padding-right:10px;white-space:nowrap;">Comuna:</td>
+                <td style="color:#111827;">{row.get("comuna","N/A")}</td>
             </tr>
             <tr>
-                <td style="font-weight:600;color:#555;padding-right:10px;white-space:nowrap;">
-                    Dirección:</td>
-                <td style="color:#111;">{row.get("direccion","N/A")}</td>
+                <td style="font-weight:600;color:#6B7280;padding-right:10px;white-space:nowrap;">Dirección:</td>
+                <td style="color:#111827;">{row.get("direccion","N/A")}</td>
             </tr>
             <tr>
-                <td style="font-weight:600;color:#555;padding-right:10px;white-space:nowrap;">
-                    Precio:</td>
-                <td style="font-weight:700;font-size:14px;color:#111;">{precio_str}</td>
+                <td style="font-weight:600;color:#6B7280;padding-right:10px;white-space:nowrap;">Precio:</td>
+                <td style="font-weight:700;font-size:15px;color:#111827;font-family:'Space Grotesk',sans-serif;">{precio_str}</td>
             </tr>
         </table>
         {route_html}
@@ -353,61 +309,58 @@ def make_popup_html(row, combustible, tag=None,
 def make_legend_html(vmin, vmax, combustible, has_user):
     grad = ", ".join(reversed(GRADIENT_COLORS))
 
-    def mini_circle_svg(stroke):
+    def mini_circle_svg(fill, stroke):
         return (
             f'<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">'
-            f'<circle cx="7" cy="7" r="6" fill="transparent" stroke="{stroke}" stroke-width="2"/>'
+            f'<circle cx="7" cy="7" r="6" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
             f'</svg>'
         )
 
     markers_html = ""
     if has_user:
-        user_icon = (
-            '<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">'
-            '<circle cx="7" cy="7" r="6" fill="#00C0FF" stroke="black" stroke-width="2"/>'
-            '</svg>'
-        )
+        # AQUÍ ESTÁN LOS COLORES CORREGIDOS:
         markers_html = f"""
-        <div style="margin-top:18px;border-top:1px solid #ddd;padding-top:12px;">
-            <p style="font-weight:700;font-size:11px;margin:0 0 10px 0;
-                      color:#333;text-transform:uppercase;letter-spacing:.5px;">
+        <div style="margin-top:18px;border-top:1px solid #374151;padding-top:16px;">
+            <p style="font-weight:700;font-size:11px;margin:0 0 12px 0;
+                      color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;font-family:sans-serif;">
                 Marcadores
             </p>
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;">
-                {user_icon}
-                <span style="font-size:11px;color:#333;line-height:1.2;">Tu<br>Ubicación</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                {mini_circle_svg("#3B82F6", "#FFFFFF")}
+                <span style="font-size:12px;color:#E5E7EB;line-height:1.2;">Tu Ubicación</span>
             </div>
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;">
-                {mini_circle_svg("#15803d")}
-                <span style="font-size:11px;color:#333;line-height:1.2;">Mejor<br>Opción</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                {mini_circle_svg("#10B981", "#FFFFFF")}
+                <span style="font-size:12px;color:#E5E7EB;line-height:1.2;">Mejor Opción</span>
             </div>
-            <div style="display:flex;align-items:center;gap:7px;">
-                {mini_circle_svg("#dc2626")}
-                <span style="font-size:11px;color:#333;line-height:1.2;">Segunda<br>Opción</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                {mini_circle_svg("#FBBF24", "#FFFFFF")}
+                <span style="font-size:12px;color:#E5E7EB;line-height:1.2;">Segunda Opción</span>
             </div>
         </div>"""
 
+    # Fondo oscuro a juego con las tarjetas de la App
     return textwrap.dedent(f"""
     <div style="
-        font-family:'Segoe UI',Arial,sans-serif;
-        padding:14px 10px;
-        background:#fafafa;
-        border:1px solid #e0e0e0;
-        border-radius:10px;
+        font-family:'Inter',sans-serif;
+        padding:16px;
+        background:#1F2937;
+        border:1px solid #374151;
+        border-radius:12px;
         height:620px;
         box-sizing:border-box;
         display:flex;
         flex-direction:column;
     ">
-        <p style="font-weight:700;font-size:12px;margin:0 0 10px 0;
-                  color:#222;text-transform:uppercase;letter-spacing:.5px;">
+        <p style="font-weight:700;font-size:12px;margin:0 0 12px 0;
+                  color:#F9FAFB;text-transform:uppercase;letter-spacing:.5px;font-family:'Space Grotesk',sans-serif;">
             Precio<br>{combustible}
         </p>
 
-        <div style="display:flex;align-items:stretch;gap:7px;flex:1;min-height:0;">
+        <div style="display:flex;align-items:stretch;gap:10px;flex:1;min-height:0;">
             <div style="
                 width:20px;
-                border-radius:6px;
+                border-radius:8px;
                 background:linear-gradient(to bottom, {grad});
                 flex-shrink:0;
             "></div>
@@ -415,17 +368,17 @@ def make_legend_html(vmin, vmax, combustible, has_user):
                 display:flex;
                 flex-direction:column;
                 justify-content:space-between;
-                font-size:10px;
-                color:#444;
+                font-size:11px;
+                color:#D1D5DB;
                 padding:2px 0;
             ">
-                <div style="font-weight:700;line-height:1.3;color:#c0392b;">
+                <div style="font-weight:700;line-height:1.3;color:#EF4444;font-family:'Space Grotesk',sans-serif;font-size:13px;">
                     {pesos(vmax)}<br>
-                    <span style="font-weight:400;font-size:9px;">más caro</span>
+                    <span style="font-weight:500;font-size:10px;color:#9CA3AF;font-family:'Inter',sans-serif;">más caro</span>
                 </div>
-                <div style="font-weight:700;line-height:1.3;color:#1a9850;">
+                <div style="font-weight:700;line-height:1.3;color:#10B981;font-family:'Space Grotesk',sans-serif;font-size:13px;">
                     {pesos(vmin)}<br>
-                    <span style="font-weight:400;font-size:9px;">más barato</span>
+                    <span style="font-weight:500;font-size:10px;color:#9CA3AF;font-family:'Inter',sans-serif;">más barato</span>
                 </div>
             </div>
         </div>
@@ -439,21 +392,10 @@ def make_legend_html(vmin, vmax, combustible, has_user):
 # ═══════════════════════════════════════════════════════════════════
 
 def render_filtros_sidebar(df, gmaps_key):
-    """Dibuja toda la barra lateral (idéntica en ambas páginas, por eso vive
-    acá) y devuelve los filtros vigentes.
-
-    OJO: Streamlit NO conserva el valor de un widget al navegar entre páginas
-    de una app multipágina, aunque se le pase `key=` — cada página remonta
-    los widgets desde cero. Por eso acá NO se usa `key=` en los selectbox;
-    en su lugar se guarda el valor elegido en una variable propia de
-    session_state (ej. "region_actual") y se la usa como `index=` al volver
-    a crear el widget — ese patrón sí sobrevive el cambio de página.
-    """
-    st.sidebar.markdown("### 🗺️ PANEL DE CONTROL")
+    st.sidebar.markdown("### :material/tune: PANEL DE CONTROL")
     st.sidebar.markdown("Usa estos filtros para explorar el mercado:")
 
-    # 0. Ubicación — se pide primero para poder sugerir Región/Comuna más abajo
-    st.sidebar.subheader("📍 Tu Ubicación")
+    st.sidebar.subheader(":material/my_location: Tu Ubicación")
     with st.sidebar:
         col_gps, col_text = st.columns([1, 4])
         with col_gps:
@@ -485,10 +427,6 @@ def render_filtros_sidebar(df, gmaps_key):
         user_lat = location["latitude"]
         user_lon = location["longitude"]
 
-    # El botón GPS hay que volver a pulsarlo en cada página (es un componente
-    # que no recuerda nada por sí solo). Para que la ubicación no se "pierda"
-    # al cambiar de Mapa a Dashboard, se guarda la última conocida y se
-    # reutiliza si esta página no entrega una nueva.
     if user_lat is not None and user_lon is not None:
         st.session_state["user_lat_actual"] = user_lat
         st.session_state["user_lon_actual"] = user_lon
@@ -499,9 +437,6 @@ def render_filtros_sidebar(df, gmaps_key):
     region_actual = st.session_state.get("region_actual", "Todas las Regiones")
     comuna_actual = st.session_state.get("comuna_actual", "Todas las Comunas")
 
-    # Auto-sugerir Región/Comuna según la ubicación entregada (solo la primera
-    # vez que aparece esa ubicación; después el usuario puede cambiar el
-    # filtro a mano sin que se la vuelva a pisar).
     if user_lat is not None and user_lon is not None:
         clave_ubicacion = (round(user_lat, 4), round(user_lon, 4))
         if st.session_state.get("_ubicacion_autofiltrada") != clave_ubicacion:
@@ -513,10 +448,9 @@ def render_filtros_sidebar(df, gmaps_key):
 
     st.sidebar.divider()
 
-    # 1. Región
     regiones = ["Todas las Regiones"] + sorted(df["region"].dropna().unique().tolist())
     idx_region = regiones.index(region_actual) if region_actual in regiones else 0
-    region_sel = st.sidebar.selectbox("📍 Selecciona una Región:", regiones, index=idx_region)
+    region_sel = st.sidebar.selectbox(":material/map: Selecciona una Región:", regiones, index=idx_region)
     st.session_state["region_actual"] = region_sel
 
     if region_sel != "Todas las Regiones":
@@ -524,12 +458,11 @@ def render_filtros_sidebar(df, gmaps_key):
     else:
         df_region = df
 
-    # 2. Comuna
     comunas = ["Todas las Comunas"] + sorted(df_region["comuna"].dropna().unique().tolist())
     if comuna_actual not in comunas:
         comuna_actual = "Todas las Comunas"
     idx_comuna = comunas.index(comuna_actual)
-    comuna_sel = st.sidebar.selectbox("🏙️ Selecciona una Comuna:", comunas, index=idx_comuna)
+    comuna_sel = st.sidebar.selectbox(":material/location_city: Selecciona una Comuna:", comunas, index=idx_comuna)
     st.session_state["comuna_actual"] = comuna_sel
 
     if user_lat is not None and user_lon is not None:
@@ -547,21 +480,18 @@ def render_filtros_sidebar(df, gmaps_key):
 
     st.sidebar.divider()
 
-    # 3. Combustible
     lista_combustibles = list(COMBUSTIBLES.keys())
     combustible_actual = st.session_state.get("combustible_actual", lista_combustibles[0])
-    idx_combustible = (
-        lista_combustibles.index(combustible_actual) if combustible_actual in lista_combustibles else 0
-    )
+    idx_combustible = lista_combustibles.index(combustible_actual) if combustible_actual in lista_combustibles else 0
     combustible = st.sidebar.selectbox(
-        "⛽ Combustible a analizar:", lista_combustibles, index=idx_combustible
+        ":material/local_gas_station: Combustible a analizar:", lista_combustibles, index=idx_combustible
     )
     st.session_state["combustible_actual"] = combustible
     st.sidebar.info(f"Análisis actual: **{combustible}** {contexto_lugar}")
 
     st.sidebar.divider()
 
-    with st.sidebar.expander("🗺️ Fondo del mapa", expanded=False):
+    with st.sidebar.expander(":material/layers: Fondo del mapa", expanded=False):
         fondos = list(FONDOS_MAPA.keys())
         fondo_actual = st.session_state.get("fondo_mapa_actual", fondos[0])
         idx_fondo = fondos.index(fondo_actual) if fondo_actual in fondos else 0
@@ -586,9 +516,8 @@ def render_filtros_sidebar(df, gmaps_key):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Mejor opción + ruteo (solo lo usa la página de Mapa)
+# Mejor opción + ruteo ... (SIN CAMBIOS LÓGICOS)
 # ═══════════════════════════════════════════════════════════════════
-
 def calcular_mejor_opcion(d, combustible, user_lat, user_lon, gmaps_key, region_sel, comuna_sel):
     best_option   = None
     second_best   = None
@@ -650,9 +579,7 @@ def calcular_mejor_opcion(d, combustible, user_lat, user_lon, gmaps_key, region_
                 t = row["distancia_km"] * 2.0
             tiempos_est.append(t)
 
-        d_cercanas["puntaje"] = d_cercanas[combustible] + (
-            pd.Series(tiempos_est, index=d_cercanas.index) * 15
-        )
+        d_cercanas["puntaje"] = d_cercanas[combustible] + (pd.Series(tiempos_est, index=d_cercanas.index) * 15)
         d_cercanas = d_cercanas.sort_values("puntaje")
 
         if len(d_cercanas) >= 1:
@@ -749,7 +676,7 @@ def construir_mapa_folium(d, combustible, fondo_mapa, user_lat, user_lon, opcion
     if opcion["route_coords"]:
         folium.PolyLine(
             locations=opcion["route_coords"],
-            color="#4285f4", weight=5, opacity=0.82,
+            color="#3B82F6", weight=5, opacity=0.82,
             tooltip=f"Ruta · {opcion['eta_str']}",
         ).add_to(m)
 
@@ -759,13 +686,16 @@ def construir_mapa_folium(d, combustible, fondo_mapa, user_lat, user_lon, opcion
     for _, row in d.iterrows():
         precio = row[combustible]
         codigo = row.get("codigo_estacion")
+        
+        # Color basado en el gradiente de precios
         fill_color = colormap(precio)
 
         if codigo == best_codigo:
+            # VERDE para la mejor opción (Ahorro)
             folium.CircleMarker(
                 location=[row["lat"], row["lon"]],
-                radius=11, color="#15803d", weight=3,
-                fill=True, fill_color=fill_color, fill_opacity=0.95,
+                radius=11, color="#10B981", weight=3,
+                fill=True, fill_color="#10B981", fill_opacity=0.95,
                 popup=folium.Popup(
                     make_popup_html(
                         row, combustible, tag="best",
@@ -776,13 +706,15 @@ def construir_mapa_folium(d, combustible, fondo_mapa, user_lat, user_lon, opcion
                     ),
                     max_width=320,
                 ),
-                tooltip=f"🌟 {row['marca']} — {pesos(precio)}",
+                tooltip=f"Mejor Opción: {row['marca']} — {pesos(precio)}",
             ).add_to(m)
+            
         elif codigo == second_codigo:
+            # AMARILLO/ÁMBAR para la segunda opción (Alternativa)
             folium.CircleMarker(
                 location=[row["lat"], row["lon"]],
-                radius=8, color="#dc2626", weight=2.5,
-                fill=True, fill_color=fill_color, fill_opacity=0.85,
+                radius=10, color="#FBBF24", weight=3,
+                fill=True, fill_color="#FBBF24", fill_opacity=0.95,
                 popup=folium.Popup(
                     make_popup_html(
                         row, combustible, tag="second",
@@ -793,15 +725,15 @@ def construir_mapa_folium(d, combustible, fondo_mapa, user_lat, user_lon, opcion
                     ),
                     max_width=320,
                 ),
-                tooltip=f"⭐ {row['marca']} — {pesos(precio)}",
+                tooltip=f"Segunda Opción: {row['marca']} — {pesos(precio)}",
             ).add_to(m)
+            
         else:
-            r_size = 4 if has_user else 5
-            f_opac = 0.35 if has_user else 0.75
+            # Estaciones normales siguen el gradiente de precios
             folium.CircleMarker(
                 location=[row["lat"], row["lon"]],
-                radius=r_size, color="#222", weight=1,
-                fill=True, fill_color=fill_color, fill_opacity=f_opac,
+                radius=5, color="#374151", weight=1,
+                fill=True, fill_color=fill_color, fill_opacity=0.6,
                 popup=folium.Popup(
                     make_popup_html(row, combustible, user_lat=user_lat, user_lon=user_lon),
                     max_width=300,
@@ -814,21 +746,21 @@ def construir_mapa_folium(d, combustible, fondo_mapa, user_lat, user_lon, opcion
             location=[user_lat, user_lon],
             icon=folium.DivIcon(
                 html=(
-                    '<div style="background:#00C0FF;width:18px;height:18px;'
-                    'border-radius:50%;border:3px solid black;'
+                    '<div style="background:#3B82F6;width:18px;height:18px;'
+                    'border-radius:50%;border:3px solid #FFFFFF;'
                     'box-shadow:0 0 8px rgba(0,0,0,0.45);"></div>'
                 ),
                 icon_size=(24, 24),
                 icon_anchor=(12, 12),
             ),
-            tooltip="📍 Tu Ubicación",
+            tooltip="Tu Ubicación",
         ).add_to(m)
 
     return m, vmin, vmax
 
 
 # ═══════════════════════════════════════════════════════════════════
-# KPIs (usado por ambas páginas)
+# KPIs
 # ═══════════════════════════════════════════════════════════════════
 
 def render_kpis(d, combustible):
@@ -840,13 +772,10 @@ def render_kpis(d, combustible):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Mapa de decisión: Precio vs. Distancia + frontera de Pareto (Dashboard)
+# Mapa de decisión: Precio vs. Distancia + frontera de Pareto
 # ═══════════════════════════════════════════════════════════════════
 
 def calcular_frontera_pareto(d, combustible, user_lat, user_lon):
-    """Marca qué estaciones están en la frontera de Pareto (precio, distancia):
-    una estación está 'dominada' si existe otra a la vez más barata y más
-    cercana — a un conductor racional nunca le conviene elegirla."""
     dd = d.dropna(subset=[combustible]).copy()
     dd["distancia_km"] = dd.apply(
         lambda row: geodesic((user_lat, user_lon), (row["lat"], row["lon"])).km, axis=1
@@ -864,15 +793,26 @@ def calcular_frontera_pareto(d, combustible, user_lat, user_lon):
     dd["en_frontera"] = en_frontera
     return dd
 
-
 def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
-    st.subheader(f"🎯 Mapa de decisión: {combustible} vs. distancia {contexto_lugar}")
+    st.subheader(f":material/radar: Mapa de decisión: {combustible} vs. distancia {contexto_lugar}")
 
     if user_lat is None or user_lon is None:
-        st.info(
-            "📍 Activa tu ubicación (GPS o dirección) en el panel de la izquierda para ver "
-            "qué estaciones realmente conviene considerar según precio **y** distancia."
-        )
+        # Usamos st.markdown pero con una estructura que Streamlit sí reconoce
+        st.markdown("""
+        <div style="
+            background-color: #1F2937; 
+            border: 1px solid #374151; 
+            border-left: 5px solid #FBBF24; 
+            border-radius: 12px; 
+            padding: 20px;
+            color: #E5E7EB;
+            margin-bottom: 20px;
+        ">
+            <p style="margin: 0; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+                Activa tu GPS o ingresa una dirección en el panel de la izquierda para ver qué estaciones realmente conviene considerar según precio y distancia.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         return
 
     dd = calcular_frontera_pareto(d, combustible, user_lat, user_lon)
@@ -908,7 +848,11 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
     fig.add_trace(go.Scatter(
         x=dominadas["distancia_km"], y=dominadas[combustible],
         mode="markers",
+<<<<<<< HEAD
         marker=dict(color="#ef4444", size=7, opacity=0.55),
+=======
+        marker=dict(color="#4B5563", size=7, opacity=0.45),
+>>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
         name="Dominadas (hay otra más barata y más cerca)",
         customdata=dominadas[["marca", "direccion", "comuna"]].values,
         hovertemplate=(
@@ -920,8 +864,13 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
     fig.add_trace(go.Scatter(
         x=xs, y=ys,
         mode="lines+markers+text",
+<<<<<<< HEAD
         line=dict(shape="spline", smoothing=1.0, color="#15803d", width=3),
         marker=dict(color="#15803d", size=12, line=dict(color="white", width=1)),
+=======
+        line=dict(shape="spline", smoothing=1.0, color="#10B981", width=2, dash="dot"),
+        marker=dict(color="#10B981", size=12, line=dict(color="#111827", width=2)),
+>>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
         text=frontera["marca"], textposition="top center",
         name="Frontera de opciones convenientes",
         customdata=frontera[["marca", "direccion", "comuna"]].values,
@@ -931,6 +880,7 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
         ),
     ))
 
+<<<<<<< HEAD
     fig.add_annotation(
         text=(
             f"✅ <b>{len(frontera)} de {len(dd)}</b> estaciones son una<br>"
@@ -942,11 +892,22 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
         bgcolor="rgba(21,128,61,0.88)", bordercolor="#15803d", borderwidth=1, borderpad=8,
     )
 
+=======
+    # Transparente para que adopte el fondo del dot grid
+>>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
     fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#E5E7EB", family="Inter"),
         xaxis_title="Distancia desde tu ubicación (km)",
         yaxis_title=f"Precio {combustible} ($)",
+<<<<<<< HEAD
         xaxis=dict(range=[x_min, x_max]),
         yaxis=dict(range=[y_min, y_max], tickprefix="$", tickformat=",.0f"),
+=======
+        yaxis=dict(tickprefix="$", tickformat=",.0f", gridcolor="#374151"),
+        xaxis=dict(gridcolor="#374151"),
+>>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
         height=480,
         margin=dict(l=0, r=0, t=10, b=0),
         legend=dict(orientation="h", y=1.12),
@@ -954,13 +915,17 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
 
     st.plotly_chart(fig, use_container_width=True)
     st.caption(
+<<<<<<< HEAD
         "🟥 Zona roja = dominada: para cualquier punto ahí dentro existe otra estación a la vez "
         "más barata y más cercana. La curva verde marca el límite de lo realmente conveniente."
+=======
+        f"**{len(frontera)}** de {len(dd)} estaciones forman la frontera: ninguna otra es a la "
+        "vez más barata y más cercana. El resto está \"dominado\" — siempre existe una mejor opción."
+>>>>>>> 9f24672bf716d9fb0f9e39ebb6885322a400d615
     )
 
-
 def render_comparativa_distribuidor(d, combustible, contexto_lugar):
-    st.subheader(f"🏷️ Comparativa por Distribuidor {contexto_lugar}")
+    st.subheader(f":material/storefront: Comparativa por Distribuidor {contexto_lugar}")
     marca = (d.groupby("marca")[combustible]
                .agg(precio="mean", estaciones="count").reset_index())
     limite_estaciones = 3 if len(d) > 20 else 1
@@ -973,7 +938,13 @@ def render_comparativa_distribuidor(d, combustible, contexto_lugar):
             hover_data={"estaciones": True, "precio": ":$,.0f"},
             labels={"precio": "Precio promedio ($)", "marca": ""}, height=350,
         )
-        fig_marca.update_layout(coloraxis_showscale=False, margin=dict(l=0, r=60, t=10, b=0))
+        fig_marca.update_layout(
+            coloraxis_showscale=False, 
+            margin=dict(l=0, r=60, t=10, b=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#E5E7EB", family="Inter")
+        )
         estilizar_barra_precio(fig_marca, marca["precio"])
         st.plotly_chart(fig_marca, use_container_width=True)
         if limite_estaciones > 1:
@@ -981,15 +952,60 @@ def render_comparativa_distribuidor(d, combustible, contexto_lugar):
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Chatbot (usado por ambas páginas)
+# Chatbot
 # ═══════════════════════════════════════════════════════════════════
 
 @st.fragment
 def render_chatbot(d_filtros, contexto_lugar):
-    st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
-    st.subheader("🤖 Asistente Virtual")
+    # CSS idéntico al Hero Banner, pero en Azul (#3B82F6)
+    st.markdown("""
+        <style>
+            /* 1. Contenedor Base: Sombra interna (inset) y degradado oscuro */
+            div[data-testid="stColumn"]:has(#chatbot-anchor) {
+                background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+                border: 1px solid #374151;
+                border-left: 5px solid #3B82F6; /* Acento Azul */
+                border-radius: 16px;
+                padding: 1.5rem;
+                /* Sombra interna para efecto "hundido" + sombra externa suave */
+                box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.4), 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+                position: sticky;
+                top: 1rem;
+                align-self: flex-start;
+                transition: all 0.2s ease;
+                overflow: hidden; /* Esencial para que las texturas no se salgan */
+                z-index: 1;
+            }
+
+            /* 3. Resplandor radial en la esquina superior derecha */
+            div[data-testid="stColumn"]:has(#chatbot-anchor)::after {
+                content: "";
+                position: absolute;
+                top: -50px; right: -50px;
+                width: 200px; height: 200px;
+                background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: -1;
+            }
+            
+            /* 4. Efecto Hover: Intensifica el azul y la sombra externa */
+            div[data-testid="stColumn"]:has(#chatbot-anchor):hover {
+                border-left-color: #60A5FA;
+                transform: translateY(-2px);
+                box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.4), 0 15px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+            
+            div[data-testid="stChatMessage"] {
+                font-family: 'Inter', sans-serif !important;
+            }
+        </style>
+        <div id="chatbot-anchor"></div>
+    """, unsafe_allow_html=True)
+
+    st.subheader(":material/smart_toy: Asistente Virtual")
     st.markdown(
-        f"<small>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>",
+        f"<small style='color: #9CA3AF;'>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>",
         unsafe_allow_html=True,
     )
 
@@ -1015,20 +1031,20 @@ def render_chatbot(d_filtros, contexto_lugar):
 
         if len(st.session_state.mensajes_chat) == 0:
             with st.chat_message("assistant"):
-                st.markdown("¡Hola! 👋 Te recomiendo **usar los filtros de la izquierda** primero para elegir tu zona. Luego, puedes escribirme o elegir una de estas preguntas frecuentes:")
+                st.markdown("¡Hola! Te recomiendo **usar los filtros de la izquierda** primero para elegir tu zona. Luego, puedes escribirme o elegir una de estas preguntas frecuentes:")
 
         sugerencia = None
 
-        if st.button("⛽ ¿Dónde están las bencinas más baratas? (93, 95 y 97)", use_container_width=True):
+        if st.button(":material/local_gas_station: ¿Dónde están las bencinas más baratas? (93, 95 y 97)", use_container_width=True):
             sugerencia = "Dime cuál es el servicentro más barato para Gasolina 93, el más barato para 95 y el más barato para 97 en la zona seleccionada. Incluye dirección, marca y precio exacto."
 
-        if st.button("🛑 ¿Cuáles son las estaciones más caras para evitarlas?", use_container_width=True):
+        if st.button(":material/block: ¿Cuáles son las estaciones más caras para evitarlas?", use_container_width=True):
             sugerencia = "Revisa los datos actuales y hazme un Top 3 de los servicentros con los precios más altos en esta zona (considerando bencinas) para saber dónde NO ir."
 
-        if st.button("🏪 ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
+        if st.button(":material/storefront: ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
             sugerencia = "De forma breve, analiza la zona y dime qué marca (ej. Copec, Shell, Petrobras o Sin Bandera) tiene opciones más convenientes. Recomiéndame la mejor estación de esa marca."
 
-        if st.button("📍 Hazme un resumen rápido de los precios en esta zona", use_container_width=True):
+        if st.button(":material/summarize: Hazme un resumen rápido de los precios", use_container_width=True):
             sugerencia = "Hazme un resumen rápido y amigable de cómo están los precios de los combustibles en esta zona específica: menciona el rango de precios y la opción más económica en general."
 
     pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
@@ -1040,7 +1056,6 @@ def render_chatbot(d_filtros, contexto_lugar):
             st.markdown(pregunta)
 
         with chat_container.chat_message("assistant"):
-
             LIMITE_FILAS = 600
 
             if len(d_filtros) > LIMITE_FILAS:
@@ -1091,7 +1106,6 @@ def render_chatbot(d_filtros, contexto_lugar):
 
                     except Exception as e:
                         error_str = str(e)
-
                         if "503" in error_str or "high demand" in error_str.lower():
                             error_msg = "⏳ Las antenas de Google están bajo alta demanda en este instante. ¡Reintenta tu pregunta en unos segundos!"
                         elif "429" in error_str or "exhausted" in error_str.lower():
