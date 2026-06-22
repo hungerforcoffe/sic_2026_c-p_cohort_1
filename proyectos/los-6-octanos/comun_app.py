@@ -877,14 +877,38 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
 
     dd = calcular_frontera_pareto(d, combustible, user_lat, user_lon)
     dominadas = dd[~dd["en_frontera"]]
-    frontera = dd[dd["en_frontera"]]
+    frontera = dd[dd["en_frontera"]].sort_values("distancia_km")
+
+    x_min, x_max = 0.0, float(dd["distancia_km"].max()) * 1.08
+    y_min, y_max = float(dd[combustible].min()) * 0.97, float(dd[combustible].max()) * 1.05
+
+    xs = frontera["distancia_km"].tolist()
+    ys = frontera[combustible].tolist()
+    # Límite exacto (en escalera) de la zona dominada: nada puede existir por
+    # debajo de él, así que sirve de borde para el sombreado, aunque la línea
+    # verde visible se dibuje suavizada por encima.
+    step_x = [x_min] + xs + [x_max]
+    step_y = [ys[0]] + ys + [ys[-1]]
 
     fig = go.Figure()
+
+    # --- Sombreado de la "zona dominada" (todo lo que queda peor que la frontera) ---
+    fig.add_trace(go.Scatter(
+        x=[x_min, x_max], y=[y_max, y_max],
+        mode="lines", line=dict(width=0),
+        hoverinfo="skip", showlegend=False,
+    ))
+    fig.add_trace(go.Scatter(
+        x=step_x, y=step_y,
+        mode="lines", line=dict(width=0, shape="hv"),
+        fill="tonexty", fillcolor="rgba(239,68,68,0.12)",
+        hoverinfo="skip", showlegend=False,
+    ))
 
     fig.add_trace(go.Scatter(
         x=dominadas["distancia_km"], y=dominadas[combustible],
         mode="markers",
-        marker=dict(color="#b0b0b0", size=7, opacity=0.45),
+        marker=dict(color="#ef4444", size=7, opacity=0.55),
         name="Dominadas (hay otra más barata y más cerca)",
         customdata=dominadas[["marca", "direccion", "comuna"]].values,
         hovertemplate=(
@@ -894,9 +918,9 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
     ))
 
     fig.add_trace(go.Scatter(
-        x=frontera["distancia_km"], y=frontera[combustible],
+        x=xs, y=ys,
         mode="lines+markers+text",
-        line=dict(shape="spline", smoothing=1.0, color="#15803d", width=2, dash="dot"),
+        line=dict(shape="spline", smoothing=1.0, color="#15803d", width=3),
         marker=dict(color="#15803d", size=12, line=dict(color="white", width=1)),
         text=frontera["marca"], textposition="top center",
         name="Frontera de opciones convenientes",
@@ -907,10 +931,22 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
         ),
     ))
 
+    fig.add_annotation(
+        text=(
+            f"✅ <b>{len(frontera)} de {len(dd)}</b> estaciones son una<br>"
+            "opción racional — el resto está dominado"
+        ),
+        xref="paper", yref="paper", x=0.99, y=0.97, xanchor="right", yanchor="top",
+        showarrow=False, align="right",
+        font=dict(size=13, color="white"),
+        bgcolor="rgba(21,128,61,0.88)", bordercolor="#15803d", borderwidth=1, borderpad=8,
+    )
+
     fig.update_layout(
         xaxis_title="Distancia desde tu ubicación (km)",
         yaxis_title=f"Precio {combustible} ($)",
-        yaxis=dict(tickprefix="$", tickformat=",.0f"),
+        xaxis=dict(range=[x_min, x_max]),
+        yaxis=dict(range=[y_min, y_max], tickprefix="$", tickformat=",.0f"),
         height=480,
         margin=dict(l=0, r=0, t=10, b=0),
         legend=dict(orientation="h", y=1.12),
@@ -918,8 +954,8 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
 
     st.plotly_chart(fig, use_container_width=True)
     st.caption(
-        f"🌟 **{len(frontera)}** de {len(dd)} estaciones forman la frontera: ninguna otra es a la "
-        "vez más barata y más cercana. El resto está \"dominado\" — siempre existe una mejor opción."
+        "🟥 Zona roja = dominada: para cualquier punto ahí dentro existe otra estación a la vez "
+        "más barata y más cercana. La curva verde marca el límite de lo realmente conveniente."
     )
 
 
@@ -948,6 +984,7 @@ def render_comparativa_distribuidor(d, combustible, contexto_lugar):
 # Chatbot (usado por ambas páginas)
 # ═══════════════════════════════════════════════════════════════════
 
+@st.fragment
 def render_chatbot(d_filtros, contexto_lugar):
     st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
     st.subheader("🤖 Asistente Virtual")

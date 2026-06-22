@@ -48,18 +48,6 @@ st.markdown(
         header[data-testid="stHeader"]:hover a:not([data-testid="stStatusWidget"] *) {
             opacity: 1;
         }
-        div[data-testid="stStatusWidget"]::before {
-            content: "" !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            background-color: rgba(0, 0, 0, 0.25) !important;
-            backdrop-filter: blur(2px) !important;
-            z-index: -99999 !important;
-            pointer-events: none !important;
-        }
         .block-container {
             padding-top: 2rem !important;
         }
@@ -542,6 +530,127 @@ def render_ranking(d_filtros, combustible, contexto_lugar, comuna_sel):
 
 
 # ═══════════════════════════════════════════════════════════════════
+# Chatbot — en su propio fragmento: preguntarle algo no recalcula el resto
+# de la página (mapa, KPIs, gráficos), solo esta columna.
+# ═══════════════════════════════════════════════════════════════════
+
+@st.fragment
+def render_chatbot(d_filtros, contexto_lugar):
+    st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
+    st.subheader("🤖 Asistente Virtual")
+    st.markdown(f"<small>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>", unsafe_allow_html=True)
+
+    google_api_key = obtener_google_api_key()
+
+    if not google_api_key:
+        st.warning("Configura GOOGLE_API_KEY en secrets.toml")
+        return
+
+    cliente = genai.Client(api_key=google_api_key)
+
+    if "mensajes_chat" not in st.session_state:
+        st.session_state.mensajes_chat = []
+
+    chat_container = st.container(height=400)
+
+    with chat_container:
+        for mensaje in st.session_state.mensajes_chat:
+            with st.chat_message(mensaje["rol"]):
+                st.markdown(mensaje["contenido"])
+
+        st.write("")
+
+        if len(st.session_state.mensajes_chat) == 0:
+            with st.chat_message("assistant"):
+                st.markdown("¡Hola! 👋 Te recomiendo **usar los filtros de la izquierda** primero para elegir tu zona. Luego, puedes escribirme o elegir una de estas preguntas frecuentes:")
+
+        sugerencia = None
+
+        if st.button("⛽ ¿Dónde están las bencinas más baratas? (93, 95 y 97)", use_container_width=True):
+            sugerencia = "Dime cuál es el servicentro más barato para Gasolina 93, el más barato para 95 y el más barato para 97 en la zona seleccionada. Incluye dirección, marca y precio exacto."
+
+        if st.button("🛑 ¿Cuáles son las estaciones más caras para evitarlas?", use_container_width=True):
+            sugerencia = "Revisa los datos actuales y hazme un Top 3 de los servicentros con los precios más altos en esta zona (considerando bencinas) para saber dónde NO ir."
+
+        if st.button("🏪 ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
+            sugerencia = "De forma breve, analiza la zona y dime qué marca (ej. Copec, Shell, Petrobras o Sin Bandera) tiene opciones más convenientes. Recomiéndame la mejor estación de esa marca."
+
+        if st.button("📍 Hazme un resumen rápido de los precios en esta zona", use_container_width=True):
+            sugerencia = "Hazme un resumen rápido y amigable de cómo están los precios de los combustibles en esta zona específica: menciona el rango de precios y la opción más económica en general."
+
+    pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
+    pregunta = sugerencia or pregunta_input
+
+    if pregunta:
+        st.session_state.mensajes_chat.append({"rol": "user", "contenido": pregunta})
+        with chat_container.chat_message("user"):
+            st.markdown(pregunta)
+
+        with chat_container.chat_message("assistant"):
+
+            LIMITE_FILAS = 600
+
+            if len(d_filtros) > LIMITE_FILAS:
+                msg_bloqueo = f"⚠️ Actualmente hay **{len(d_filtros)}** estaciones cargadas. Para evitar un consumo excesivo y darte una respuesta precisa, selecciona una **Región** o **Comuna** en la izquierda."
+                st.warning(msg_bloqueo)
+                st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": msg_bloqueo})
+            else:
+                with st.spinner("Analizando estaciones de la zona..."):
+                    try:
+                        columnas_ia = ['region', 'comuna', 'direccion', 'marca', 'Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene']
+                        cols_validas = [c for c in columnas_ia if c in d_filtros.columns]
+
+                        d_ia = d_filtros[cols_validas].copy()
+
+                        combustibles_disp = [c for c in ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene'] if c in d_ia.columns]
+                        d_ia = d_ia.dropna(subset=combustibles_disp, how='all')
+
+                        datos_texto = d_ia.fillna("").to_csv(index=False)
+
+                        INSTRUCCIONES = f"""
+                        Eres un asistente experto en combustibles de Chile.
+
+                        BASE DE DATOS ACTUAL COHERENTE CON EL DASHBOARD ({contexto_lugar}):
+                        {datos_texto}
+
+                        REGLAS ESTRICTAS DE OPTIMIZACIÓN (CERO REPREGUNTAS):
+                        1. IGNORA EL CONTEXTO PREVIO: Trata esta consulta como única y asume la zona geográfica entregada.
+                        2. RESPUESTA EXHAUSTIVA Y ANTICIPATORIA: Si te preguntan por barato/caro, entrega de inmediato un TOP 3 en formato lista con marca, comuna, dirección y precio ($1.250).
+                        3. DIRECTO AL GRANO: Sin introducciones robóticas ni explicaciones del código.
+                        4. DICCIONARIO SEMÁNTICO:
+                           - "bencina" = Gasolina. Si no especifican octanaje, entrega el Top 1 de la más económica para 93, 95 y 97 consecutivamente.
+                           - "petróleo" = Diésel.
+                           - "parafina" = Kerosene.
+                        """
+
+                        respuesta = cliente.models.generate_content(
+                            model='gemini-2.5-flash',
+                            contents=pregunta,
+                            config=types.GenerateContentConfig(
+                                system_instruction=INSTRUCCIONES,
+                                temperature=0.1
+                            )
+                        )
+
+                        texto_final = respuesta.text
+                        st.markdown(texto_final)
+                        st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": texto_final})
+
+                    except Exception as e:
+                        error_str = str(e)
+
+                        if "503" in error_str or "high demand" in error_str.lower():
+                            error_msg = "⏳ Las antenas de Google están bajo alta demanda en este instante. ¡Reintenta tu pregunta en unos segundos!"
+                        elif "429" in error_str or "exhausted" in error_str.lower():
+                            error_msg = "🛑 ¡Wow, vas muy rápido! El satélite necesita enfriarse un poco. Por favor, espera un minuto antes de hacer otra consulta."
+                        else:
+                            error_msg = f"Error técnico de enlace: `{e}`"
+
+                        st.error(error_msg)
+                        st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": error_msg})
+
+
+# ═══════════════════════════════════════════════════════════════════
 # INTERFAZ PRINCIPAL
 # ═══════════════════════════════════════════════════════════════════
 
@@ -957,117 +1066,4 @@ with col_viz:
     st.caption("Fuente: Comisión Nacional de Energía (CNE) · Proyecto SIC Coding & Programming")
 
 with col_chat:
-    # ══════════════════════════════════════════════════════════════
-    # 🤖 MÓDULO DE IA: CHATBOT CON BOTONES INTEGRADOS
-    # ══════════════════════════════════════════════════════════════
-    st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
-    st.subheader("🤖 Asistente Virtual")
-    st.markdown(f"<small>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>", unsafe_allow_html=True)
-
-    google_api_key = obtener_google_api_key()
-
-    if not google_api_key:
-        st.warning("Configura GOOGLE_API_KEY en secrets.toml")
-    else:
-        cliente = genai.Client(api_key=google_api_key)
-
-        if "mensajes_chat" not in st.session_state:
-            st.session_state.mensajes_chat = []
-
-        chat_container = st.container(height=400)
-
-        with chat_container:
-            for mensaje in st.session_state.mensajes_chat:
-                with st.chat_message(mensaje["rol"]):
-                    st.markdown(mensaje["contenido"])
-
-            st.write("")
-
-            if len(st.session_state.mensajes_chat) == 0:
-                with st.chat_message("assistant"):
-                    st.markdown("¡Hola! 👋 Te recomiendo **usar los filtros de la izquierda** primero para elegir tu zona. Luego, puedes escribirme o elegir una de estas preguntas frecuentes:")
-
-            sugerencia = None
-
-            if st.button("⛽ ¿Dónde están las bencinas más baratas? (93, 95 y 97)", use_container_width=True):
-                sugerencia = "Dime cuál es el servicentro más barato para Gasolina 93, el más barato para 95 y el más barato para 97 en la zona seleccionada. Incluye dirección, marca y precio exacto."
-
-            if st.button("🛑 ¿Cuáles son las estaciones más caras para evitarlas?", use_container_width=True):
-                sugerencia = "Revisa los datos actuales y hazme un Top 3 de los servicentros con los precios más altos en esta zona (considerando bencinas) para saber dónde NO ir."
-
-            if st.button("🏪 ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
-                sugerencia = "De forma breve, analiza la zona y dime qué marca (ej. Copec, Shell, Petrobras o Sin Bandera) tiene opciones más convenientes. Recomiéndame la mejor estación de esa marca."
-
-            if st.button("📍 Hazme un resumen rápido de los precios en esta zona", use_container_width=True):
-                sugerencia = "Hazme un resumen rápido y amigable de cómo están los precios de los combustibles en esta zona específica: menciona el rango de precios y la opción más económica en general."
-
-        pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
-        pregunta = sugerencia or pregunta_input
-
-        if pregunta:
-            st.session_state.mensajes_chat.append({"rol": "user", "contenido": pregunta})
-            with chat_container.chat_message("user"):
-                st.markdown(pregunta)
-
-            with chat_container.chat_message("assistant"):
-
-                LIMITE_FILAS = 600
-
-                if len(d_filtros) > LIMITE_FILAS:
-                    msg_bloqueo = f"⚠️ Actualmente hay **{len(d_filtros)}** estaciones cargadas. Para evitar un consumo excesivo y darte una respuesta precisa, selecciona una **Región** o **Comuna** en la izquierda."
-                    st.warning(msg_bloqueo)
-                    st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": msg_bloqueo})
-                else:
-                    with st.spinner("Analizando estaciones de la zona..."):
-                        try:
-                            columnas_ia = ['region', 'comuna', 'direccion', 'marca', 'Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene']
-                            cols_validas = [c for c in columnas_ia if c in d_filtros.columns]
-
-                            d_ia = d_filtros[cols_validas].copy()
-
-                            combustibles_disp = [c for c in ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene'] if c in d_ia.columns]
-                            d_ia = d_ia.dropna(subset=combustibles_disp, how='all')
-
-                            datos_texto = d_ia.fillna("").to_csv(index=False)
-
-                            INSTRUCCIONES = f"""
-                            Eres un asistente experto en combustibles de Chile.
-
-                            BASE DE DATOS ACTUAL COHERENTE CON EL DASHBOARD ({contexto_lugar}):
-                            {datos_texto}
-
-                            REGLAS ESTRICTAS DE OPTIMIZACIÓN (CERO REPREGUNTAS):
-                            1. IGNORA EL CONTEXTO PREVIO: Trata esta consulta como única y asume la zona geográfica entregada.
-                            2. RESPUESTA EXHAUSTIVA Y ANTICIPATORIA: Si te preguntan por barato/caro, entrega de inmediato un TOP 3 en formato lista con marca, comuna, dirección y precio ($1.250).
-                            3. DIRECTO AL GRANO: Sin introducciones robóticas ni explicaciones del código.
-                            4. DICCIONARIO SEMÁNTICO:
-                               - "bencina" = Gasolina. Si no especifican octanaje, entrega el Top 1 de la más económica para 93, 95 y 97 consecutivamente.
-                               - "petróleo" = Diésel.
-                               - "parafina" = Kerosene.
-                            """
-
-                            respuesta = cliente.models.generate_content(
-                                model='gemini-2.5-flash',
-                                contents=pregunta,
-                                config=types.GenerateContentConfig(
-                                    system_instruction=INSTRUCCIONES,
-                                    temperature=0.1
-                                )
-                            )
-
-                            texto_final = respuesta.text
-                            st.markdown(texto_final)
-                            st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": texto_final})
-
-                        except Exception as e:
-                            error_str = str(e)
-
-                            if "503" in error_str or "high demand" in error_str.lower():
-                                error_msg = "⏳ Las antenas de Google están bajo alta demanda en este instante. ¡Reintenta tu pregunta en unos segundos!"
-                            elif "429" in error_str or "exhausted" in error_str.lower():
-                                error_msg = "🛑 ¡Wow, vas muy rápido! El satélite necesita enfriarse un poco. Por favor, espera un minuto antes de hacer otra consulta."
-                            else:
-                                error_msg = f"Error técnico de enlace: `{e}`"
-
-                            st.error(error_msg)
-                            st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": error_msg})
+    render_chatbot(d_filtros, contexto_lugar)
