@@ -1007,6 +1007,10 @@ def render_chatbot(d_filtros, contexto_lugar):
 
         if st.button(":material/near_me: ¿Cuál es la estación barata MÁS CERCANA a mi?", use_container_width=True):
             sugerencia = "Considerando mi ubicación actual, recomiéndame la estación más cercana que tenga un precio económico. Dame la dirección y el link para ir hacia allá."
+            
+        if st.button(":material/storefront: ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
+            sugerencia = "De forma breve, analiza la zona y dime qué marca (ej. Copec, Shell, Petrobras o Sin Bandera) tiene opciones más convenientes. Recomiéndame la mejor estación de esa marca."
+
 
         pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
         pregunta = sugerencia or pregunta_input
