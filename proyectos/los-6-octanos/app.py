@@ -254,7 +254,7 @@ st.markdown(
         <div class="hero-content">
             <div class="hero-badge">Monitoreo Territorial Diario</div>
             <h1>BenciMap · Chile</h1>
-            <p>Explora en tiempo real los precios de más de 2.000 estaciones de servicio en todo el país. Una plataforma inteligente que cruza datos en vivo y geolocalización para ayudarte a combatir las fluctuaciones del mercado, comparar opciones al instante y tomar decisiones que protejan tu economía.</p>
+            <p>Explora y evalúa los precios de las casi 2.000 estaciones de servicio que hay en todo el país. Una plataforma inteligente que cruza los datos reales y geolocalización para ayudarte a conocer el mercado, comparar opciones al instante y tomar las mejores decisiones que protejan tu economía..</p>
         </div>
     </div>
     """,
