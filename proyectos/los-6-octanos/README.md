@@ -15,7 +15,8 @@ Proyecto desarrollado para el curso **Código y Programación** del **Samsung In
 
 ---
 ## ⚙️ Datos
-* **Fuente de Datos:**
+* **Fuente de Datos:** 
+
 [API Oficial de Combustibles de la CNE](https://api.cne.cl/api/v4/estaciones). *(Catálogo completo: https://apidocs.cne.cl)*
 
 Filas: 7.436  |  Columnas: 21  |  Licencia: "Acceso completo y gratuito" - [Datos de Gobierno](datos.gob.cl): Creative Commons Zero (CC0)
@@ -39,6 +40,7 @@ Puedes probar nuestro Dashboard interactivo aquí:
 
 ## 📊 Hallazgos, Visualizaciones y Funcionalidades
 **Hallazgo principal**
+
 Existe una brecha de precios significativa entre distribuidores de una misma localidad, lo que convierte a este dashboard interactivo y a su asistente con IA en herramientas clave para que los conductores identifiquen ahorros inmediatos en tiempo real antes de cargar combustible.
 
 * **Mapa Dinámico de Precios:** Cada estación está geolocalizada y coloreada según su precio (tonos verdes para las opciones más económicas).
