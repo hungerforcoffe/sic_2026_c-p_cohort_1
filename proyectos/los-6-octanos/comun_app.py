@@ -992,6 +992,7 @@ def render_chatbot(d_filtros, contexto_lugar):
                         4. DICCIONARIO SEMÁNTICO:
                            - "bencina" = Gasolina. Si no especifican octanaje, entrega el Top 1 de la más económica para 93, 95 y 97 consecutivamente.
                            - "petróleo" = Diésel.
+                           - "parafina" = Kerosene.
                         """
 
                         respuesta = cliente.models.generate_content(
