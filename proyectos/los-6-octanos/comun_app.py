@@ -797,10 +797,22 @@ def render_scatter_pareto(d, combustible, contexto_lugar, user_lat, user_lon):
     st.subheader(f":material/radar: Mapa de decisión: {combustible} vs. distancia {contexto_lugar}")
 
     if user_lat is None or user_lon is None:
-        st.info(
-            "📍 Activa tu ubicación (GPS o dirección) en el panel de la izquierda para ver "
-            "qué estaciones realmente conviene considerar según precio **y** distancia."
-        )
+        # Usamos st.markdown pero con una estructura que Streamlit sí reconoce
+        st.markdown("""
+        <div style="
+            background-color: #1F2937; 
+            border: 1px solid #374151; 
+            border-left: 5px solid #FBBF24; 
+            border-radius: 12px; 
+            padding: 20px;
+            color: #E5E7EB;
+            margin-bottom: 20px;
+        ">
+            <p style="margin: 0; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+                Activa tu GPS o ingresa una dirección en el panel de la izquierda para ver qué estaciones realmente conviene considerar según precio y distancia.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         return
 
     dd = calcular_frontera_pareto(d, combustible, user_lat, user_lon)
@@ -887,7 +899,68 @@ def render_comparativa_distribuidor(d, combustible, contexto_lugar):
 # ═══════════════════════════════════════════════════════════════════
 
 def render_chatbot(d_filtros, contexto_lugar):
-    st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
+    # CSS idéntico al Hero Banner, pero en Azul (#3B82F6)
+    st.markdown("""
+        <style>
+            /* 1. Contenedor Base: Sombra interna (inset) y degradado oscuro */
+            div[data-testid="stColumn"]:has(#chatbot-anchor) {
+                background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+                border: 1px solid #374151;
+                border-left: 5px solid #3B82F6; /* Acento Azul */
+                border-radius: 16px;
+                padding: 1.5rem;
+                /* Sombra interna para efecto "hundido" + sombra externa suave */
+                box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.4), 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+                position: sticky;
+                top: 1rem;
+                align-self: flex-start;
+                transition: all 0.2s ease;
+                overflow: hidden; /* Esencial para que las texturas no se salgan */
+                z-index: 1;
+            }
+            
+            /* 2. Textura de líneas diagonales (Patrón técnico azulado) */
+            div[data-testid="stColumn"]:has(#chatbot-anchor)::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: repeating-linear-gradient(
+                    45deg,
+                    rgba(59, 130, 246, 0.03),
+                    rgba(59, 130, 246, 0.03) 2px,
+                    transparent 2px,
+                    transparent 12px
+                );
+                pointer-events: none; /* No bloquea los clics en el chat */
+                z-index: -1;
+            }
+
+            /* 3. Resplandor radial en la esquina superior derecha */
+            div[data-testid="stColumn"]:has(#chatbot-anchor)::after {
+                content: "";
+                position: absolute;
+                top: -50px; right: -50px;
+                width: 200px; height: 200px;
+                background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: -1;
+            }
+            
+            /* 4. Efecto Hover: Intensifica el azul y la sombra externa */
+            div[data-testid="stColumn"]:has(#chatbot-anchor):hover {
+                border-left-color: #60A5FA;
+                transform: translateY(-2px);
+                box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.4), 0 15px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+            
+            div[data-testid="stChatMessage"] {
+                font-family: 'Inter', sans-serif !important;
+            }
+        </style>
+        <div id="chatbot-anchor"></div>
+    """, unsafe_allow_html=True)
+
     st.subheader(":material/smart_toy: Asistente Virtual")
     
     # 1. Rescatamos la ubicación en tiempo real de la memoria de la app

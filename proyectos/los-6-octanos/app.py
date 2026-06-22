@@ -8,7 +8,7 @@ Ejecutar:
 import streamlit as st
 
 st.set_page_config(
-    page_title="Precios de Combustibles · Chile",
+    page_title="BenciMap · Chile",
     page_icon="⛽",
     layout="wide",
 )
@@ -152,7 +152,7 @@ st.markdown(
             font-size: 1.05rem !important;
             color: #9CA3AF !important;
             margin: 0 !important;
-            max-width: 800px;
+            max-width: 1200px;
             line-height: 1.6 !important;
         }
 
@@ -168,18 +168,81 @@ st.markdown(
         header[data-testid="stHeader"]:hover a:not([data-testid="stStatusWidget"] *) {
             opacity: 1;
         }
-        div[data-testid="stStatusWidget"]::before {
-            content: "" !important;
+        
+     /* === INDICADOR DE CARGA: "REACTOR NEÓN" + OVERLAY DESENFOCADO === */
+        
+        /* 1. Transformamos el widget base en un cristal oscuro a pantalla completa */
+        div[data-testid="stStatusWidget"] {
+            visibility: visible !important;
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background-color: rgba(0, 0, 0, 0.25) !important;
-            backdrop-filter: blur(2px) !important;
-            z-index: -99999 !important;
-            pointer-events: none !important;
+            /* Usamos el azul oscuro de nuestra paleta Eco-Drive con 85% de opacidad */
+            background-color: rgba(17, 24, 39, 0.85) !important; 
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+            z-index: 999998 !important;
+            color: transparent !important; /* Oculta el texto nativo "Running..." */
         }
+        
+        /* Ocultamos los íconos por defecto de Streamlit dentro del widget */
+        div[data-testid="stStatusWidget"] img, 
+        div[data-testid="stStatusWidget"] svg,
+        div[data-testid="stStatusWidget"] span {
+            display: none !important;
+        }
+
+        /* 2. El Spinner Neón Centrado */
+        div[data-testid="stStatusWidget"]::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -30px;
+            margin-left: -30px;
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(16, 185, 129, 0.1);
+            border-top: 4px solid #10B981;
+            border-right: 4px solid #3B82F6;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), inset 0 0 15px rgba(59, 130, 246, 0.4);
+            animation: spinReactor 1s linear infinite;
+            z-index: 999999;
+        }
+
+        /* 3. Texto palpitante debajo del spinner */
+        div[data-testid="stStatusWidget"]::after {
+            content: "Sincronizando...";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 50px);
+            color: #10B981;
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+            animation: pulseNeonText 1.5s ease-in-out infinite;
+            z-index: 999999;
+            white-space: nowrap;
+        }
+
+        /* 4. Las animaciones */
+        @keyframes spinReactor {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseNeonText {
+            0%, 100% { opacity: 0.5; text-shadow: 0 0 5px rgba(16, 185, 129, 0.4); }
+            50% { opacity: 1; text-shadow: 0 0 15px rgba(16, 185, 129, 0.9); }
+        }
+
         .block-container {
             padding-top: 2rem !important;
         }
@@ -205,9 +268,8 @@ st.markdown(
     <div class="hero-banner">
         <div class="hero-content">
             <div class="hero-badge">Monitoreo Territorial Diario</div>
-            <h1>Precios de Combustibles en Chile</h1>
-            <p>Una herramienta diseñada para explorar precios por distribuidor, región y comuna. 
-            Analiza el mercado en tiempo real, toma decisiones informadas y protege tu economía familiar.</p>
+            <h1>BenciMap · Chile</h1>
+            <p>Explora en tiempo real los precios de más de 2.000 estaciones de servicio en todo el país. Una plataforma inteligente que cruza datos en vivo y geolocalización para ayudarte a combatir las fluctuaciones del mercado, comparar opciones al instante y tomar decisiones que protejan tu economía.</p>
         </div>
     </div>
     """,
