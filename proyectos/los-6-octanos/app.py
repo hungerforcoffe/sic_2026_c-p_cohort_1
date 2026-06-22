@@ -1,9 +1,9 @@
 """
-app_multipage.py — Punto de entrada de la app multipágina (Mapa + Dashboard).
+app.py — Punto de entrada de la app multipágina (Mapa + Dashboard).
 
 Ejecutar:
     pip install -r requirements.txt
-    streamlit run app_multipage.py
+    streamlit run app.py
 """
 import streamlit as st
 
