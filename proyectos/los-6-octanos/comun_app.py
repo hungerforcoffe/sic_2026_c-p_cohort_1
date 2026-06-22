@@ -889,10 +889,16 @@ def render_comparativa_distribuidor(d, combustible, contexto_lugar):
 def render_chatbot(d_filtros, contexto_lugar):
     st.markdown('<div id="chatbot-anchor"></div>', unsafe_allow_html=True)
     st.subheader(":material/smart_toy: Asistente Virtual")
-    st.markdown(
-        f"<small style='color: #9CA3AF;'>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>",
-        unsafe_allow_html=True,
-    )
+    
+    # 1. Rescatamos la ubicación en tiempo real de la memoria de la app
+    user_lat = st.session_state.get("user_lat_actual")
+    user_lon = st.session_state.get("user_lon_actual")
+    
+    # Pequeño feedback visual para el usuario
+    if user_lat and user_lon:
+        st.markdown(f"<small style='color: #10B981;'>📍 GPS Activo: El asistente conoce tu ubicación actual para calcular rutas.</small>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<small style='color: #9CA3AF;'>Hablemos sobre los datos actuales **{contexto_lugar}**. ¡Pregúntame con confianza!</small>", unsafe_allow_html=True)
 
     google_api_key = obtener_google_api_key()
 
@@ -926,14 +932,11 @@ def render_chatbot(d_filtros, contexto_lugar):
         if st.button(":material/block: ¿Cuáles son las estaciones más caras para evitarlas?", use_container_width=True):
             sugerencia = "Revisa los datos actuales y hazme un Top 3 de los servicentros con los precios más altos en esta zona (considerando bencinas) para saber dónde NO ir."
 
-        if st.button(":material/storefront: ¿Qué marca o distribuidor me conviene más por aquí?", use_container_width=True):
-            sugerencia = "De forma breve, analiza la zona y dime qué marca (ej. Copec, Shell, Petrobras o Sin Bandera) tiene opciones más convenientes. Recomiéndame la mejor estación de esa marca."
+        if st.button(":material/near_me: ¿Cuál es la estación barata MÁS CERCANA a mi?", use_container_width=True):
+            sugerencia = "Considerando mi ubicación actual, recomiéndame la estación más cercana que tenga un precio económico. Dame la dirección y el link para ir hacia allá."
 
-        if st.button(":material/summarize: Hazme un resumen rápido de los precios", use_container_width=True):
-            sugerencia = "Hazme un resumen rápido y amigable de cómo están los precios de los combustibles en esta zona específica: menciona el rango de precios y la opción más económica en general."
-
-    pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
-    pregunta = sugerencia or pregunta_input
+        pregunta_input = st.chat_input("O escribe tu propia pregunta aquí...")
+        pregunta = sugerencia or pregunta_input
 
     if pregunta:
         st.session_state.mensajes_chat.append({"rol": "user", "contenido": pregunta})
@@ -948,23 +951,39 @@ def render_chatbot(d_filtros, contexto_lugar):
                 st.warning(msg_bloqueo)
                 st.session_state.mensajes_chat.append({"rol": "assistant", "contenido": msg_bloqueo})
             else:
-                with st.spinner("Analizando estaciones de la zona..."):
+                with st.spinner("Analizando estaciones y rutas..."):
                     try:
-                        columnas_ia = ['region', 'comuna', 'direccion', 'marca', 'Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene']
+                        columnas_ia = ['region', 'comuna', 'direccion', 'marca', 'lat', 'lon', 'Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene']
                         cols_validas = [c for c in columnas_ia if c in d_filtros.columns]
 
                         d_ia = d_filtros[cols_validas].copy()
-
                         combustibles_disp = [c for c in ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'Kerosene'] if c in d_ia.columns]
                         d_ia = d_ia.dropna(subset=combustibles_disp, how='all')
 
                         datos_texto = d_ia.fillna("").to_csv(index=False)
+                        
+                        # 2. Bloque Dinámico de GPS para Gemini
+                        contexto_gps = ""
+                        if user_lat is not None and user_lon is not None:
+                            contexto_gps = f"""
+                            [CONTEXTO DE UBICACIÓN EN TIEMPO REAL]
+                            El usuario está ubicado exactamente en las coordenadas: Latitud {user_lat}, Longitud {user_lon}.
+                            Cuando recomiendes una estación, calcula mentalmente la más cercana según las columnas 'lat' y 'lon' de la tabla de datos.
+                            MUY IMPORTANTE: Siempre que recomiendes una estación específica, DEBES incluir este enlace markdown exacto para que el usuario abra la ruta:
+                            [📍 Trazar ruta hacia la estación](https://www.google.com/maps/dir/?api=1&origin={user_lat},{user_lon}&destination=LATITUD_ESTACION,LONGITUD_ESTACION&travelmode=driving)
+                            (Debes reemplazar LATITUD_ESTACION y LONGITUD_ESTACION por los valores de la columna lat y lon de la estación recomendada).
+                            """
+                        else:
+                            contexto_gps = "[CONTEXTO DE UBICACIÓN] El usuario NO ha compartido su ubicación. No puedes darle distancias ni enlaces de ruteo."
 
+                        # 3. Instrucciones consolidadas
                         INSTRUCCIONES = f"""
                         Eres un asistente experto en combustibles de Chile.
 
                         BASE DE DATOS ACTUAL COHERENTE CON EL DASHBOARD ({contexto_lugar}):
                         {datos_texto}
+
+                        {contexto_gps}
 
                         REGLAS ESTRICTAS DE OPTIMIZACIÓN (CERO REPREGUNTAS):
                         1. IGNORA EL CONTEXTO PREVIO: Trata esta consulta como única y asume la zona geográfica entregada.
@@ -973,7 +992,6 @@ def render_chatbot(d_filtros, contexto_lugar):
                         4. DICCIONARIO SEMÁNTICO:
                            - "bencina" = Gasolina. Si no especifican octanaje, entrega el Top 1 de la más económica para 93, 95 y 97 consecutivamente.
                            - "petróleo" = Diésel.
-                           - "parafina" = Kerosene.
                         """
 
                         respuesta = cliente.models.generate_content(
