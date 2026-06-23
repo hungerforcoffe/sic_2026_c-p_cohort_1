@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/
+
+# Desktop Service Store - Mac
+.DS_Store
